@@ -1,36 +1,17 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+### Set up
 
-## Getting Started
+Run `node websocket-server.js` from the driectory root.
 
-First, run the development server:
+In a new console, run `npm run dev`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Running locally in two or more windows
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Simply go to `http://localhost:3000` in each window after setting up.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Control from a smartphone
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+If trying to control from another device, change the following:
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1) Run `ipconfig` on hosting device (laptop) and copy the `IPv4 Address`
+2) In `./app/layout.js`, change the `WebSocket` ip address to be "`ws://{IPv4Address}:8080`"
+3) On the device, go to `http://{IPv4Address}:3000`
