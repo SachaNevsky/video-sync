@@ -14,4 +14,9 @@ server.on('connection', (socket) => {
   });
 });
 
-console.log('WebSocket server is running on ws://10.105.2.77:8080');
+var os = require('os');
+
+let networkInterfaces = os.networkInterfaces();
+let ipv4 = networkInterfaces.Ethernet.find((i) => i.family === "IPv4").address;
+console.log("IPv4 Ethernet address:", ipv4)
+console.log(`WebSocket server is running on ws://192.168.1.87:8080`);

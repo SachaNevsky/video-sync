@@ -33,7 +33,33 @@ body {
 }
 
 button {
-  outline: solid white 1px;
+  -webkit-box-shadow:inset 0px 0px 0px 2px white;
+  -moz-box-shadow:inset 0px 0px 0px 2px white;
+  box-shadow:inset 0px 0px 0px 2px white;
   padding: 10px;
   margin: 10px 10px 0 10px;
+}
+
+button:hover {
+  -webkit-box-shadow:inset 0px 0px 0px 3px coral;
+  -moz-box-shadow:inset 0px 0px 0px 3px coral;
+  box-shadow:inset 0px 0px 0px 3px coral;
+}
+
+a {
+  -webkit-box-shadow:inset 0px 0px 0px 2px white;
+  -moz-box-shadow:inset 0px 0px 0px 2px white;
+  box-shadow:inset 0px 0px 0px 2px white;
+  padding: 10px;
+  margin: 10px 10px 0 10px;
+}
+
+a:hover {
+  -webkit-box-shadow:inset 0px 0px 0px 3px coral;
+  -moz-box-shadow:inset 0px 0px 0px 3px coral;
+  box-shadow:inset 0px 0px 0px 3px coral;
+}
+
+input {
+  accent-color: coral;
 }
