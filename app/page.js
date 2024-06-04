@@ -1,6 +1,6 @@
 export default function Home() {
 
-	const buttonStyle = "border m-auto p-5 hover:bg-orange-400 "
+	const buttonStyle = "m-auto p-5 hover:bg-orange-400 "
 
 	return (
 		<div className="bg-black py-4 h-screen text-white text-center grid grid-cols-6 grid-rows-4 gap-2 p-4">
