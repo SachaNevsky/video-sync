@@ -107,6 +107,7 @@ export default function Home() {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                     setCurrentCaptionIndex(Captions.captions.indexOf(element))
                     setCaption(element.text);
+                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text }));
                     if (element.speaker === "presenter") {
                         setTextColor("text-white")
                     } else if (element.speaker === "speaker") {
@@ -121,6 +122,7 @@ export default function Home() {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                     setCurrentCaptionIndex(OriginalCaptions.captions.indexOf(element))
                     setCaption(element.text);
+                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text }));
                     setTextColor("text-white");
                 }
             }

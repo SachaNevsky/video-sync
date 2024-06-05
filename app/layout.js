@@ -24,6 +24,8 @@ export default function RootLayout({ children }) {
 					video.currentTime = data.time;
 				} else if (data.type === 'playback') {
 					video.playbackRate = data.playback;
+				} else if (data.type === "caption") {
+					video.textContent = data.caption;
 				}
 			};
 
