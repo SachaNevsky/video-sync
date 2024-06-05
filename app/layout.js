@@ -21,7 +21,6 @@ export default function RootLayout({ children }) {
 				} else if (data.type === "pause") {
 					video.pause();
 				} else if (data.type === 'seek') {
-					console.log("layout", data.time)
 					video.currentTime = data.time;
 				} else if (data.type === 'playback') {
 					video.playbackRate = data.playback;
