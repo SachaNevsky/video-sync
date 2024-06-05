@@ -1,5 +1,4 @@
 export default function Home() {
-
 	return (
 		<div className="bg-black py-4 h-screen text-white text-center grid m-auto">
 			<div className="pt-4">

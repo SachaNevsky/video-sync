@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Captions from "/public/BBC_Space/BBC_Space.json";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause, faHome, faVideo } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
     const [timestamp, setTimestamp] = useState(0);
