@@ -87,11 +87,48 @@ export default function Home() {
     // }
 
     // If you want the reading out to be done via the player device speaker
-    const handleReadOut = () => {
+    // const handleReadOut = () => {
+    //     if (caption !== "") {
+    //         videoRef.current.pause();
+    //         window.socket.send(JSON.stringify({ type: 'pause' }));
+    //         window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
+    //     }
+    // }
+
+    const handleReadOut = (playerSpeaker) => {
         if (caption !== "") {
-            videoRef.current.pause();
-            window.socket.send(JSON.stringify({ type: 'pause' }));
-            window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
+            if(playerSpeaker) {
+                videoRef.current.pause();
+                window.socket.send(JSON.stringify({ type: 'pause' }));
+                window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
+            } else {
+                videoRef.current.pause();
+                window.socket.send(JSON.stringify({ type: 'pause' }));
+                const speech = new Speech();
+    
+                speech.init({
+                    volume: 1.0,
+                    lang: "en-GB",
+                    rate: 1,
+                    pitch: 1
+                }).then(data => {
+                    console.log("Speech is ready", data);
+                    speech.speak({
+                        text: caption,
+                        queue: false,
+                        // listeners: {
+                        //     onend: () => {
+                        //         videoRef.current.play();
+                        //         window.socket.send(JSON.stringify({ type: 'play', time: videoRef.current.currentTime }));
+                        //     }
+                        // }
+                    }).catch(e => {
+                        console.error("Error:", e)
+                    })
+                }).catch(e => {
+                    console.error("Error initialising speech:", e)
+                })
+            }
         }
     }
 
@@ -153,7 +190,7 @@ export default function Home() {
                 <div className="pb-6 align-end">
                     <button className="px-5 py-3" onClick={handleBack}>Go back ⬅</button>
                     <button className="px-5 py-3" onClick={handleSimplifyCaptions}>Simple Captions: {simplified ? "👍" : "👎"}</button>
-                    {simplified && <button className="px-5 py-3" onClick={handleReadOut}>Read out 🔊</button>}
+                    {simplified && <button className="px-5 py-3" onClick={() => handleReadOut(true)}>Read out 🔊</button>} 
                 </div>
             </div>
             <div className="mx-auto w-3/5 py-4">
