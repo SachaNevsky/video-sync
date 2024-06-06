@@ -107,7 +107,6 @@ export default function Home() {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                     setCurrentCaptionIndex(Captions.captions.indexOf(element))
                     setCaption(element.text);
-                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text }));
                     if (element.speaker === "presenter") {
                         setTextColor("text-white")
                     } else if (element.speaker === "speaker") {
@@ -115,6 +114,7 @@ export default function Home() {
                     } else if (element.speaker === "interviewee") {
                         setTextColor("text-sky-500")
                     }
+                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
                 }
             }
         } else {
@@ -122,12 +122,12 @@ export default function Home() {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                     setCurrentCaptionIndex(OriginalCaptions.captions.indexOf(element))
                     setCaption(element.text);
-                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text }));
                     setTextColor("text-white");
+                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
                 }
             }
         }
-    }, [timestamp, simplified])
+    }, [timestamp, simplified, textColor])
 
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-4 auto-rows-max m-auto">
