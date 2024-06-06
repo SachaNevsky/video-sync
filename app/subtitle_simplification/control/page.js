@@ -54,34 +54,44 @@ export default function Home() {
         
     }
 
+    // If you want the reading out to be done by the control device speaker
+    // const handleReadOut = () => {
+    //     if (caption !== "") {
+    //         videoRef.current.pause();
+    //         window.socket.send(JSON.stringify({ type: 'pause' }));
+    //         const speech = new Speech();
+
+    //         speech.init({
+    //             volume: 1.0,
+    //             lang: "en-GB",
+    //             rate: 1,
+    //             pitch: 1
+    //         }).then(data => {
+    //             console.log("Speech is ready", data);
+    //             speech.speak({
+    //                 text: caption,
+    //                 queue: false,
+    //                 listeners: {
+    //                     onend: () => {
+    //                         videoRef.current.play();
+    //                         window.socket.send(JSON.stringify({ type: 'play', time: videoRef.current.currentTime }));
+    //                     }
+    //                 }
+    //             }).catch(e => {
+    //                 console.error("Error:", e)
+    //             })
+    //         }).catch(e => {
+    //             console.error("Error initialising speech:", e)
+    //         })
+    //     }
+    // }
+
+    // If you want the reading out to be done via the player device speaker
     const handleReadOut = () => {
         if (caption !== "") {
             videoRef.current.pause();
             window.socket.send(JSON.stringify({ type: 'pause' }));
-            const speech = new Speech();
-
-            speech.init({
-                volume: 1.0,
-                lang: "en-GB",
-                rate: 1,
-                pitch: 1
-            }).then(data => {
-                console.log("Speech is ready", data);
-                speech.speak({
-                    text: caption,
-                    queue: false,
-                    listeners: {
-                        onend: () => {
-                            videoRef.current.play();
-                            window.socket.send(JSON.stringify({ type: 'play', time: videoRef.current.currentTime }));
-                        }
-                    }
-                }).catch(e => {
-                    console.error("Error:", e)
-                })
-            }).catch(e => {
-                console.error("Error initialising speech:", e)
-            })
+            window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
         }
     }
 
@@ -140,15 +150,6 @@ export default function Home() {
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src="/BBC_Space/BBC_Space.vtt" />
             </video>
             <div className="mx-auto w-3/5 py-4 text-center row-span-2 flex flex-col">
-                {simplified ? (
-                    <div className={textColor + " max-w-[60ch] m-auto text-4xl font-medium"}>
-                        {caption}
-                    </div>
-                ) : (
-                    <div className={"max-w-[51ch] m-auto text-4xl font-medium"}>
-                        {caption}
-                    </div>
-                )}
                 <div className="pb-6 align-end">
                     <button className="px-5 py-3" onClick={handleBack}>Go back ⬅</button>
                     <button className="px-5 py-3" onClick={handleSimplifyCaptions}>Simple Captions: {simplified ? "👍" : "👎"}</button>

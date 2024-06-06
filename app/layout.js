@@ -25,7 +25,9 @@ export default function RootLayout({ children }) {
 				} else if (data.type === 'playback') {
 					video.playbackRate = data.playback;
 				} else if (data.type === "caption") {
-					video.textContent = `${data.caption}~${data.simplified}~${data.textColor}`;
+					video.textContent = `${data.caption}~~${data.simplified}~~${data.textColor}`;
+				} else if (data.type === "readOut") {
+					video.spellcheck = data.readOut;
 				}
 			};
 
