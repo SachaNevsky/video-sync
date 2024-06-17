@@ -1,6 +1,8 @@
 ### Set up
 
-Run `node websocket-server.js` from the driectory root.
+First, run `npm install` to download all the dependencies.
+
+In one console, run `node websocket-server.js` from the driectory root.
 
 In a new console, run `npm run dev`.
 

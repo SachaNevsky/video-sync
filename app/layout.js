@@ -15,6 +15,9 @@ export default function RootLayout({ children }) {
 			socket.onmessage = (event) => {
 				const data = JSON.parse(event.data);
 				const video = document.querySelector('video');
+				const speechAudioRef = document.querySelector("#speechAudio");
+				const backgroundAudioRef = document.querySelector("#backgroundAudio");
+				
 				if (data.type === "play") {
 					video.currentTime = data.time;
 					video.play();
@@ -28,6 +31,24 @@ export default function RootLayout({ children }) {
 					video.textContent = `${data.caption}~~${data.simplified}~~${data.textColor}`;
 				} else if (data.type === "readOut") {
 					video.spellcheck = data.readOut;
+				} else if (data.type === "toggleBackground") {
+					video.spellcheck = data.toggleBackground;
+				} else if (data.type === "handleSpeechVolume") {
+					speechAudioRef.volume = parseFloat(data.speechVolume) / 100;
+				} else if (data.type === "handleBackgroundVolume") {
+					backgroundAudioRef.volume = parseFloat(data.backgroundVolume) / 100;
+				} else if (data.type === "playAll") {
+					video.play();
+					speechAudioRef.play();
+					backgroundAudioRef.play();
+				} else if (data.type === "pauseAll") {
+					video.pause();
+					speechAudioRef.pause();
+					backgroundAudioRef.pause();
+				} else if (data.type === "seekAll") {
+					video.currentTime = data.time;
+					speechAudioRef.currentTime = data.time;
+					backgroundAudioRef.currentTime = data.time;
 				}
 			};
 

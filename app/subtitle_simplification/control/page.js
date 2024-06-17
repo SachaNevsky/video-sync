@@ -160,6 +160,8 @@ export default function Home() {
                         setTextColor("text-yellow-300")
                     } else if (element.speaker === "interviewee") {
                         setTextColor("text-sky-500")
+                    } else {
+                        setTextColor("text-white")
                     }
                     window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
                 }
