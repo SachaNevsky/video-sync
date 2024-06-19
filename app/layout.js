@@ -49,6 +49,8 @@ export default function RootLayout({ children }) {
 					video.currentTime = data.time;
 					speechAudioRef.currentTime = data.time;
 					backgroundAudioRef.currentTime = data.time;
+				} else if (data.type === "selectVideo") {
+					video.src = `/${data.video}/${data.video}.mp4`;
 				}
 			};
 

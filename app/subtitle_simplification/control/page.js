@@ -2,16 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Speech from "speak-tts";
-import Captions from "/public/BBC_Space/BBC_Space_simplified.json";
-import OriginalCaptions from "/public/BBC_Space/BBC_Space.json";
+import bbc_space_simplified_captions from "/public/bbc_space/bbc_space_simplified.json";
+import bbc_space_captions from "/public/bbc_space/bbc_space.json";
+import university_challenge_simplified_captions from "/public/university_challenge/university_challenge_simplified.json"
+import university_challenge_captions from "/public/university_challenge/university_challenge.json"
 
 export default function Home() {
     const [timestamp, setTimestamp] = useState(0);
     const [textColor, setTextColor] = useState("text-white");
     const [duration, setDuration] = useState(0);
-    const [caption, setCaption] = useState("");
+    const [currentCaption, setCurrentCaption] = useState("");
     const [simplified, setSimplified] = useState(false);
     const [currentCaptionIndex, setCurrentCaptionIndex] = useState(0);
+    const [video, setVideo] = useState("bbc_space");
+
     const videoRef = useRef(null);
 
     const convertTime = (t) => {
@@ -42,10 +46,22 @@ export default function Home() {
 
     const handleBack = () => {
         if(currentCaptionIndex > 0) {
-            const newTime = convertTime(Captions.captions[currentCaptionIndex - 1].start)
+            let newTime = 0;
+            if(video === "bbc_video") {
+                if(simplified) {
+                    newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start)
+                } else {
+                    newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start)
+                }
+            } else if (video === "university_challenge") {
+                if(simplified) {
+                    newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start)
+                } else {
+                    newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start)
+                }
+            }
             setCurrentCaptionIndex(currentCaptionIndex - 1)
             setTimestamp(newTime)
-            console.log(parseFloat(convertTime(Captions.captions[currentCaptionIndex].start, newTime)))
             videoRef.current.currentTime = newTime;
             videoRef.current.pause();
             window.socket.send(JSON.stringify({ type: 'seek', time: newTime }));
@@ -88,7 +104,7 @@ export default function Home() {
 
     // If you want the reading out to be done via the player device speaker
     // const handleReadOut = () => {
-    //     if (caption !== "") {
+    //     if (currentCaption !== "") {
     //         videoRef.current.pause();
     //         window.socket.send(JSON.stringify({ type: 'pause' }));
     //         window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
@@ -96,7 +112,7 @@ export default function Home() {
     // }
 
     const handleReadOut = (playerSpeaker) => {
-        if (caption !== "") {
+        if (currentCaption !== "") {
             if(playerSpeaker) {
                 videoRef.current.pause();
                 window.socket.send(JSON.stringify({ type: 'pause' }));
@@ -114,7 +130,7 @@ export default function Home() {
                 }).then(data => {
                     console.log("Speech is ready", data);
                     speech.speak({
-                        text: caption,
+                        text: currentCaption,
                         queue: false,
                         // listeners: {
                         //     onend: () => {
@@ -133,11 +149,23 @@ export default function Home() {
     }
 
     useEffect(() => {
-        setDuration(videoRef.current.duration);
+        if(videoRef.current.duration) {
+            setDuration(videoRef.current.duration);
+        }
 
         const checkTime = () => {
             if (videoRef.current.currentTime !== timestamp) {
                 setTimestamp(videoRef.current.currentTime);
+            }
+
+            if(`http://localhost:3000/${video}/${video}.mp4` !== videoRef.current.src) {
+                if(videoRef.current.duration) {
+                    setDuration(videoRef.current.duration);
+                }
+                setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
+                setCurrentCaption("");
+                setSimplified(false);
+                setCurrentCaptionIndex(0);
             }
         };
 
@@ -146,37 +174,67 @@ export default function Home() {
         return () => {
             clearInterval(interval);
         };
-    }, [timestamp]);
+    }, [timestamp, video]);
 
     useEffect(() => {
         if(simplified) {
-            for (const element of Captions.captions) {
-                if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                    setCurrentCaptionIndex(Captions.captions.indexOf(element))
-                    setCaption(element.text);
-                    if (element.speaker === "presenter") {
-                        setTextColor("text-white")
-                    } else if (element.speaker === "speaker") {
-                        setTextColor("text-yellow-300")
-                    } else if (element.speaker === "interviewee") {
-                        setTextColor("text-sky-500")
-                    } else {
-                        setTextColor("text-white")
+            if(video === "bbc_space") {
+                for (const element of bbc_space_simplified_captions.captions) {
+                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                        setCurrentCaptionIndex(bbc_space_simplified_captions.captions.indexOf(element))
+                        setCurrentCaption(element.text);
+                        if (element.speaker === "presenter") {
+                            setTextColor("text-white")
+                        } else if (element.speaker === "speaker") {
+                            setTextColor("text-yellow-300")
+                        } else if (element.speaker === "interviewee") {
+                            setTextColor("text-sky-500")
+                        } else {
+                            setTextColor("text-white")
+                        }
+                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
                     }
-                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                }
+            } else if(video === "university_challenge") {
+                for (const element of university_challenge_simplified_captions.captions) {
+                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                        setCurrentCaptionIndex(university_challenge_simplified_captions.captions.indexOf(element))
+                        setCurrentCaption(element.text);
+                        if (element.speaker === "presenter") {
+                            setTextColor("text-white")
+                        } else if (element.speaker === "speaker") {
+                            setTextColor("text-yellow-300")
+                        } else if (element.speaker === "interviewee") {
+                            setTextColor("text-sky-500")
+                        } else {
+                            setTextColor("text-white")
+                        }
+                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                    }
                 }
             }
         } else {
-            for (const element of OriginalCaptions.captions) {
-                if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                    setCurrentCaptionIndex(OriginalCaptions.captions.indexOf(element))
-                    setCaption(element.text);
-                    setTextColor("text-white");
-                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+            if(video === "bbc_space") {
+                for (const element of bbc_space_captions.captions) {
+                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                        setCurrentCaptionIndex(bbc_space_captions.captions.indexOf(element))
+                        setCurrentCaption(element.text);
+                        setTextColor("text-white");
+                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                    }
+                }
+            } else if(video === "university_challenge") {
+                for (const element of university_challenge_captions.captions) {
+                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                        setCurrentCaptionIndex(university_challenge_captions.captions.indexOf(element))
+                        setCurrentCaption(element.text);
+                        setTextColor("text-white");
+                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                    }
                 }
             }
         }
-    }, [timestamp, simplified, textColor])
+    }, [timestamp, simplified, textColor, video])
 
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-4 auto-rows-max m-auto">
@@ -184,9 +242,8 @@ export default function Home() {
                 <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
                 <a href="/subtitle_simplification/player" className="m-auto px-5 py-3 mx-3">Player 📺</a>
             </div>
-            <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden">
-                <source src="/BBC_Space/BBC_Space.mp4" type="video/mp4" />
-                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src="/BBC_Space/BBC_Space.vtt" />
+            <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
+                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
             <div className="mx-auto w-3/5 py-4 text-center row-span-2 flex flex-col">
                 <div className="pb-6 align-end">

@@ -9,6 +9,25 @@ export default function Page() {
     const [timestamp, setTimestamp] = useState(0);
     const [simplified, setSimplified] = useState(false);
     const [textColor, setTextColor] = useState("text-white");
+    const [muted, setMuted] = useState(true);
+    const [video, setVideo] = useState("bbc_space")
+
+    const handleMuted = () => {
+        setMuted(!muted);
+    }
+
+    const selectVideo = (newVideo) => {
+        if(window.socket !== undefined && window.socket.readyState === socket.OPEN) {
+            setVideo(newVideo);
+            window.socket.send(JSON.stringify({ type: 'selectVideo', video: newVideo }));
+        }
+    }
+
+    useEffect(() => {
+        if(`/${video}/${video}.mp4` !== videoRef.current.src) {
+            selectVideo(video)
+        }
+    }, [video])
 
     useEffect(() => {
         const toBool = (text) => {return String(text).toLowerCase() === "true"};
@@ -25,8 +44,6 @@ export default function Page() {
                     rate: 1,
                     pitch: 1
                 }).then(data => {
-                    console.log("Speech is ready", data);
-                    console.log(videoRef.current.textContent.split("~~"))
                     speech.speak({
                         text: videoRef.current.textContent.split("~~")[0],
                         queue: false,
@@ -46,7 +63,6 @@ export default function Page() {
 
         const checkTime = () => {
             if (videoRef.current.currentTime !== timestamp) {
-                console.log(videoRef.current.spellcheck)
                 setTimestamp(videoRef.current.currentTime);
                 setCaptions(videoRef.current.textContent.split("~~")[0]);
                 setSimplified(toBool(videoRef.current.textContent.split("~~")[1]));
@@ -65,23 +81,30 @@ export default function Page() {
     }, [timestamp]);
 
     return (
-        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-10">
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
             <div className="pt-4">
                 <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
                 <a href="/subtitle_simplification/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
             </div>
+            <div className="mx-auto w-3/5 py-4">
+                <button onClick={() => selectVideo("bbc_space")}>
+                    BBC News
+                </button>
+                <button onClick={() => selectVideo("university_challenge")}>
+                    Quiz Show
+                </button>
+            </div>
             <div className="mx-auto w-3/5 py-4 text-center row-span-7">
-                <video ref={videoRef} controls muted className="h-full mx-auto">
-                    <source src="/BBC_Space/BBC_Space.mp4" type="video/mp4" />
+                <video ref={videoRef} controls muted={muted} src={`/${video}/${video}.mp4`} type="video/mp4" className="h-full mx-auto">
                     <track
                         id="subtitles"
                         label="Simplified"
                         kind="subtitles"
                         srcLang="en"
-                        src="/BBC_Space/BBC_Space_simplified.vtt" />
+                        src={`/${video}/${video}_simplified.vtt`} />
                 </video>
             </div>
-            <div className="mx-auto w-3/5 py-4 text-center grid-start-9 row-span-2">
+            <div className="mx-auto w-3/5 py-4 text-center grid-start-10 row-span-2">
                 {videoRef.current && simplified ? (
                         <div className={textColor + " max-w-[60ch] m-auto text-3xl font-medium"}>
                             {captions}
@@ -92,6 +115,10 @@ export default function Page() {
                         </div>
                     )
                 }
+            </div>
+            <div className="mx-auto w-3/5 py-4 text-center grid-start-11">
+                <button onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
+                {videoRef.current && videoRef.current.timestamp ? (<p>{videoRef.current.timestamp}</p>) : (<p></p>)}
             </div>
         </div>
     );
