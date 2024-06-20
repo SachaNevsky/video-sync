@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
-import Captions from "/public/BBC_Space/BBC_Space.json";
+import bbc_space_captions from "/public/bbc_space/bbc_space.json";
+import university_challenge_captions from "/public/university_challenge/university_challenge.json"
 
 export default function Home() {
     const [timestamp, setTimestamp] = useState(0);
@@ -10,6 +11,9 @@ export default function Home() {
     const [slowMode, setSlowMode] = useState(false);
     const [playback, setPlayback] = useState(1);
     const [magnitude, setMagnitude] = useState(0.03);
+    const [captions, setCaptions] = useState(bbc_space_captions);
+    const [video, setVideo] = useState("bbc_space");
+
 	const videoRef = useRef(null);
 
 	const handlePlay = () => {
@@ -38,12 +42,21 @@ export default function Home() {
     }
 
 	useEffect(() => {
-		setDuration(videoRef.current.duration);
+		if(videoRef.current.duration) {
+            setDuration(videoRef.current.duration);
+        }
 		
 		const checkTime = () => {
 			if (videoRef.current.currentTime !== timestamp) {
 				setTimestamp(videoRef.current.currentTime);
 			}
+
+            if(`http://localhost:3000/${video}/${video}.mp4` !== videoRef.current.src) {
+                if(videoRef.current.duration) {
+                    setDuration(videoRef.current.duration);
+                }
+                setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
+            }
 		};
 
 		const interval = setInterval(checkTime, 100);
@@ -51,15 +64,22 @@ export default function Home() {
 		return () => {
 			clearInterval(interval);
 		};
-	}, [timestamp]);
+	}, [timestamp, video]);
 
     useEffect(() => {
         const convertTime = (t) => {
             const text = t.split(":")
             return (parseInt(text[0], 10) * 60 * 60) + (parseInt(text[1], 10) * 60) + parseFloat(text[2])
         }
+
+        if(video === "bbc_space") {
+            setCaptions(bbc_space_captions)
+        } else if (video === "university_challenge") {
+            setCaptions(university_challenge_captions)
+        }
         
-        for(const element of Captions.captions) {
+        for(const element of captions.captions) {
+            console.log(element)
             if(parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                 setCaption(element.text)
                 if(slowMode && parseInt(element.flesch_kincaid) >= 8) {
@@ -75,7 +95,7 @@ export default function Home() {
                 }
             }
         }
-    }, [timestamp, slowMode, magnitude, playback])
+    }, [timestamp, slowMode, magnitude, playback, video, captions])
 
     return (
 		<div className="bg-black py-4 h-screen text-white text-center grid grid-rows-3 auto-rows-max m-auto">
@@ -83,9 +103,8 @@ export default function Home() {
 				<a href="/" className="m-auto px-5 py-3 mx-3">Home 🏠</a>
                 <a href="/slower_subtitles/player" className="m-auto px-5 py-3">Player 📺</a>
 			</div>
-			<video ref={videoRef} controls muted className="mx-auto w-3/5 hidden">
-				<source src="/BBC_Space/BBC_Space.mp4" type="video/mp4" />
-				<track id="subtitles" label="English" kind="subtitles" srcLang="en" src="/BBC_Space/BBC_Space.vtt"/>
+			<video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
+				<track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}_simplified.vtt`}/>
 			</video>
 			<div className="mx-auto w-3/5 py-4">
                 <div className="pb-6">

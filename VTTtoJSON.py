@@ -8,7 +8,6 @@ def flesch_kincaid(text):
     num_words = len(text.split())
     mult = math.ceil(100/num_words) + 1
     calcText = f"{text.replace("\n", " ")}. ".replace("..",".") * mult
-    print(f"{num_words} * {mult} = {len(calcText.split())}")
     r = Readability(calcText)
     fk = r.flesch_kincaid()
     return fk.grade_level
@@ -21,7 +20,7 @@ for element in webvtt.read(filename, encoding="utf-8"):
         "start": element.start,
         "end": element.end,
         "text": element.text.replace("\u00a0\n", " ").replace("\u2019", "'").replace("\n", " ").replace("  ", " "),
-        # "flesch_kincaid": flesch_kincaid(element.text)
+        "flesch_kincaid": flesch_kincaid(element.text)
     }
     jsonObj["captions"].append(caption)
 
