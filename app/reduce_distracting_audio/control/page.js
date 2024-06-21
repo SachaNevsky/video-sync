@@ -9,6 +9,8 @@ export default function Page() {
     const [toggleBackground, setToggleBackground] = useState(false);
     const [speechVolume, setSpeechVolume] = useState(100);
     const [backgroundVolume, setBackgroundVolume] = useState(50);
+    const [video, setVideo] = useState("bbc_space");
+
     const videoRef = useRef(null);
     const speechRef = useRef(null);
     const backgroundRef = useRef(null);
@@ -17,19 +19,23 @@ export default function Page() {
         videoRef.current.play();
         speechRef.current.play();
         backgroundRef.current.play()
+        setTimestamp(videoRef.current.currentTime);
         window.socket.send(JSON.stringify({ type: 'playAll', time: videoRef.current.currentTime }));
     };
 
     const handlePause = () => {
         videoRef.current.pause();
         speechRef.current.pause();
-        backgroundRef.current.pause()
-        window.socket.send(JSON.stringify({ type: 'pauseAll' }));
+        backgroundRef.current.pause();
+        setTimestamp(videoRef.current.currentTime);
+        window.socket.send(JSON.stringify({ type: 'pauseAll', time: videoRef.current.currentTime }));
     };
 
     const handleSeek = (event) => {
         const time = parseFloat(event.target.value);
         videoRef.current.currentTime = time;
+        speechRef.current.currentTime = time;
+        backgroundRef.current.currentTime = time;
         setTimestamp(videoRef.current.currentTime);
         window.socket.send(JSON.stringify({ type: 'seekAll', time: time }));
     };
@@ -50,11 +56,20 @@ export default function Page() {
     }
 
     useEffect(() => {
-        setDuration(videoRef.current.duration);
+        if (videoRef.current.duration) {
+            setDuration(videoRef.current.duration);
+        }
 
         const checkTime = () => {
             if (videoRef.current.currentTime !== timestamp) {
                 setTimestamp(videoRef.current.currentTime);
+            }
+
+            if (`http://localhost:3000/${video}/${video}.mp4` !== videoRef.current.src) {
+                if (videoRef.current.duration) {
+                    setDuration(videoRef.current.duration);
+                }
+                setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
             }
         };
 
@@ -63,7 +78,7 @@ export default function Page() {
         return () => {
             clearInterval(interval);
         };
-    }, [timestamp]);
+    }, [timestamp, video]);
 
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-4">
@@ -71,12 +86,11 @@ export default function Page() {
                 <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
                 <a href="/reduce_distracting_audio/player" className="m-auto px-5 py-3 mx-3">Player 📺</a>
             </div>
-            <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden">
-                <source src="/BBC_Space/BBC_Space.mp4" type="video/mp4" />
-                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src="/BBC_Space/BBC_Space.vtt" />
+            <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
+                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
-            <audio id="speechAudio" src="/BBC_Space/BBC_Space_speech.mp3" type="audio/mpeg" ref={speechRef} muted></audio>
-            <audio id="backgroundAudio" src="/BBC_Space/BBC_Space_background.mp3" type="audio/mpeg" ref={backgroundRef} muted></audio>
+            <audio id="speechAudio" src={`/${video}/${video}_speech_LONGER.mp3`} type="audio/mpeg" ref={speechRef} muted></audio>
+            <audio id="backgroundAudio" src={`/${video}/${video}_background_LONGER.mp3`} type="audio/mpeg" ref={backgroundRef} muted></audio>
             <div>
                 <button onClick={handleToggleBackground}>Reduce Background Noise {toggleBackground ? "👍" : "👎"}</button>
             </div>

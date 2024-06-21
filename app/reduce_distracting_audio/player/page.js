@@ -9,30 +9,40 @@ export default function Home() {
     const backgroundRef = useRef(null);
 
     const [timestamp, setTimestamp] = useState(0);
-    const [toggleBackground, setToggleBackground] = useState(false);
     const [speechVolume, setSpeechVolume] = useState(1);
     const [backgroundVolume, setBackgroundVolume] = useState(1);
     const [muted, setMuted] = useState(true);
+    const [video, setVideo] = useState("bbc_space")
 
     const handleMuted = () => {
         setMuted(!muted);
     }
 
+    const selectVideo = (newVideo) => {
+        if (window.socket !== undefined && window.socket.readyState === socket.OPEN) {
+            setVideo(newVideo);
+            window.socket.send(JSON.stringify({ type: 'selectVideo', video: newVideo }));
+        }
+    }
+
+    useEffect(() => {
+        if (`/${video}/${video}.mp4` !== videoRef.current.src) {
+            selectVideo(video)
+        }
+    }, [video])
+
     useEffect(() => {
         const checkTime = () => {
             if (videoRef.current.currentTime !== timestamp) {
                 setTimestamp(videoRef.current.currentTime);
-                setToggleBackground(videoRef.current.spellcheck);
             }
 
-            if(speechRef.current.volume !== speechVolume) {
+            if (speechRef.current.volume !== speechVolume) {
                 setSpeechVolume(speechRef.current.volume);
-                console.log("speechVolume", speechVolume);
             }
 
-            if(backgroundRef.current.volume !== backgroundVolume) {
+            if (backgroundRef.current.volume !== backgroundVolume) {
                 setBackgroundVolume(backgroundRef.current.volume);
-                console.log("backgroundVolume", backgroundVolume);
             }
         };
 
@@ -41,32 +51,30 @@ export default function Home() {
         return () => {
             clearInterval(interval);
         };
-    }, [timestamp, speechVolume, backgroundVolume])
+    }, [timestamp, speechVolume, backgroundVolume]);
 
-	return (
-		<div className="bg-black py-4 h-screen text-white text-center grid m-auto">
-			<div className="pt-4">
-				<a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-				<a href="/reduce_distracting_audio/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
-			</div>
-            <video ref={videoRef} controls className="mx-auto w-3/5" muted>
-                <source src="/BBC_Space/BBC_Space.mp4" type="video/mp4"/>
-                <track
-                    id="subtitles"
-                    label="English"
-                    kind="subtitles"
-                    srcLang="en"
-                    src="/BBC_Space/BBC_Space.vtt"/>
+    return (
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto">
+            <div className="pt-4">
+                <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
+                <a href="/reduce_distracting_audio/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
+            </div>
+            <div className="mx-auto w-3/5 py-4">
+                <button onClick={() => selectVideo("bbc_space")}>
+                    BBC News
+                </button>
+                <button onClick={() => selectVideo("university_challenge")}>
+                    Quiz Show
+                </button>
+            </div>
+            <video ref={videoRef} controls muted className="mx-auto w-3/5" src={`/${video}/${video}.mp4`} type="video/mp4">
+                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
-            <audio id="speechAudio" ref={speechRef} volume={speechVolume} muted={muted}>
-                <source src="/BBC_Space/BBC_Space_speech.mp3" type="audio/mpeg"/>
-            </audio>
-            <audio id="backgroundAudio" ref={backgroundRef} volume={backgroundVolume} muted={muted}>
-                <source src="/BBC_Space/BBC_Space_background.mp3" type="audio/mpeg"/>
-            </audio>
+            <audio id="speechAudio" src={`/${video}/${video}_speech_LONGER.mp3`} type="audio/mpeg" ref={speechRef} muted={muted}></audio>
+            <audio id="backgroundAudio" src={`/${video}/${video}_background_LONGER.mp3`} type="audio/mpeg" ref={backgroundRef} muted={muted}></audio>
             <div>
                 <button onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
             </div>
-		</div>
-	);
+        </div>
+    );
 }

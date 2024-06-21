@@ -38,10 +38,16 @@ export default function RootLayout({ children }) {
 				} else if (data.type === "handleBackgroundVolume") {
 					backgroundAudioRef.volume = parseFloat(data.backgroundVolume) / 100;
 				} else if (data.type === "playAll") {
+					video.currentTime = data.time;
+					speechAudioRef.currentTime = data.time;
+					backgroundAudioRef.currentTime = data.time;
 					video.play();
 					speechAudioRef.play();
 					backgroundAudioRef.play();
 				} else if (data.type === "pauseAll") {
+					video.currentTime = data.time;
+					speechAudioRef.currentTime = data.time;
+					backgroundAudioRef.currentTime = data.time;
 					video.pause();
 					speechAudioRef.pause();
 					backgroundAudioRef.pause();
