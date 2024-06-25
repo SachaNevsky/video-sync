@@ -16,43 +16,36 @@ export default function Page() {
     const backgroundRef = useRef(null);
 
     const handlePlay = () => {
-        videoRef.current.play();
-        speechRef.current.play();
-        backgroundRef.current.play()
-        setTimestamp(videoRef.current.currentTime);
         window.socket.send(JSON.stringify({ type: 'playAll', time: videoRef.current.currentTime }));
     };
 
     const handlePause = () => {
-        videoRef.current.pause();
-        speechRef.current.pause();
-        backgroundRef.current.pause();
-        setTimestamp(videoRef.current.currentTime);
         window.socket.send(JSON.stringify({ type: 'pauseAll', time: videoRef.current.currentTime }));
     };
 
+    const handleBack = () => {
+        const time = videoRef.current.currentTime - 10;
+        window.socket.send(JSON.stringify({ type: 'back10', time: time }));
+    }
+
     const handleSeek = (event) => {
-        const time = parseFloat(event.target.value);
-        videoRef.current.currentTime = time;
-        speechRef.current.currentTime = time;
-        backgroundRef.current.currentTime = time;
-        setTimestamp(videoRef.current.currentTime);
+        const time = parseFloat(event);
         window.socket.send(JSON.stringify({ type: 'seekAll', time: time }));
     };
 
-    const handleSpeechVolume = (e) => {
-        setSpeechVolume(e);
-        window.socket.send(JSON.stringify({ type: 'handleSpeechVolume', speechVolume: e }));
+    const handleSpeechVolume = (event) => {
+        setSpeechVolume(event);
+        window.socket.send(JSON.stringify({ type: 'handleSpeechVolume', speechVolume: event }));
     }
 
-    const handleBackgroundVolume = (e) => {
-        setBackgroundVolume(e);
-        window.socket.send(JSON.stringify({ type: 'handleBackgroundVolume', backgroundVolume: e }));
+    const handleBackgroundVolume = (event) => {
+        setBackgroundVolume(event);
+        window.socket.send(JSON.stringify({ type: 'handleBackgroundVolume', backgroundVolume: event }));
     }
 
     const handleToggleBackground = () => {
         setToggleBackground(!toggleBackground);
-        window.socket.send(JSON.stringify({ type: 'toggleBackground', toggleBackground: toggleBackground }));
+        window.socket.send(JSON.stringify({ type: 'toggleBackground', toggleBackground: toggleBackground, speechVolume: speechVolume, backgroundVolume: backgroundVolume }));
     }
 
     useEffect(() => {
@@ -73,7 +66,7 @@ export default function Page() {
             }
         };
 
-        const interval = setInterval(checkTime, 100);
+        const interval = setInterval(checkTime, 10);
 
         return () => {
             clearInterval(interval);
@@ -86,11 +79,11 @@ export default function Page() {
                 <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
                 <a href="/reduce_distracting_audio/player" className="m-auto px-5 py-3 mx-3">Player 📺</a>
             </div>
-            <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
+            <video id="videoController" ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
-            <audio id="speechAudio" src={`/${video}/${video}_speech_LONGER.mp3`} type="audio/mpeg" ref={speechRef} muted></audio>
-            <audio id="backgroundAudio" src={`/${video}/${video}_background_LONGER.mp3`} type="audio/mpeg" ref={backgroundRef} muted></audio>
+            <audio id="speechAudio" src={`/${video}/${video}_speech.mp3`} type="audio/mpeg" ref={speechRef} muted/>
+            <audio id="backgroundAudio" src={`/${video}/${video}_background.mp3`} type="audio/mpeg" ref={backgroundRef} muted/>
             <div>
                 <button onClick={handleToggleBackground}>Reduce Background Noise {toggleBackground ? "👍" : "👎"}</button>
             </div>
@@ -106,6 +99,7 @@ export default function Page() {
             </div>}
             <div className="mx-auto w-3/5 py-4">
                 <div className="pb-6">
+                    <button className="px-5 py-3" onClick={handleBack}>⬅ Back</button>
                     <button className="px-5 py-3" onClick={handlePlay}>Play ▶</button>
                     <button className="px-5 py-3" onClick={handlePause}>Pause ⏸</button>
                 </div>
@@ -115,9 +109,8 @@ export default function Page() {
                         type="range"
                         min={0}
                         max={duration}
-                        step={0.1}
                         value={timestamp}
-                        onChange={handleSeek}
+                        onChange={(e) => handleSeek(e.target.value)}
                     />
                     <div>
                         {Math.floor(timestamp / 60)}:{('0' + parseInt(timestamp - Math.floor(timestamp / 60) * 60)).slice(-2)} / {Math.floor(duration / 60)}:{('0' + parseInt(duration - Math.floor(duration / 60) * 60)).slice(-2)}

@@ -45,75 +45,36 @@ export default function Home() {
     }
 
     const handleBack = () => {
-        if(currentCaptionIndex > 0) {
+        if (currentCaptionIndex > 0) {
             let newTime = 0;
-            if(video === "bbc_video") {
-                if(simplified) {
-                    newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start)
+
+            if (video === "bbc_space") {
+                if (!simplified) {
+                    newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start);
                 } else {
-                    newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start)
+                    newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start);
                 }
             } else if (video === "university_challenge") {
-                if(simplified) {
-                    newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start)
+                if (!simplified) {
+                    newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start);
                 } else {
-                    newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start)
+                    newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start);
                 }
             }
-            setCurrentCaptionIndex(currentCaptionIndex - 1)
-            setTimestamp(newTime)
+
+            setCurrentCaptionIndex(currentCaptionIndex - 1);
+            setTimestamp(newTime);
             videoRef.current.currentTime = newTime;
             videoRef.current.pause();
             window.socket.send(JSON.stringify({ type: 'seek', time: newTime }));
             window.socket.send(JSON.stringify({ type: 'pause' }));
         }
-        
+
     }
-
-    // If you want the reading out to be done by the control device speaker
-    // const handleReadOut = () => {
-    //     if (caption !== "") {
-    //         videoRef.current.pause();
-    //         window.socket.send(JSON.stringify({ type: 'pause' }));
-    //         const speech = new Speech();
-
-    //         speech.init({
-    //             volume: 1.0,
-    //             lang: "en-GB",
-    //             rate: 1,
-    //             pitch: 1
-    //         }).then(data => {
-    //             console.log("Speech is ready", data);
-    //             speech.speak({
-    //                 text: caption,
-    //                 queue: false,
-    //                 listeners: {
-    //                     onend: () => {
-    //                         videoRef.current.play();
-    //                         window.socket.send(JSON.stringify({ type: 'play', time: videoRef.current.currentTime }));
-    //                     }
-    //                 }
-    //             }).catch(e => {
-    //                 console.error("Error:", e)
-    //             })
-    //         }).catch(e => {
-    //             console.error("Error initialising speech:", e)
-    //         })
-    //     }
-    // }
-
-    // If you want the reading out to be done via the player device speaker
-    // const handleReadOut = () => {
-    //     if (currentCaption !== "") {
-    //         videoRef.current.pause();
-    //         window.socket.send(JSON.stringify({ type: 'pause' }));
-    //         window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
-    //     }
-    // }
 
     const handleReadOut = (playerSpeaker) => {
         if (currentCaption !== "") {
-            if(playerSpeaker) {
+            if (playerSpeaker) {
                 videoRef.current.pause();
                 window.socket.send(JSON.stringify({ type: 'pause' }));
                 window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
@@ -121,7 +82,7 @@ export default function Home() {
                 videoRef.current.pause();
                 window.socket.send(JSON.stringify({ type: 'pause' }));
                 const speech = new Speech();
-    
+
                 speech.init({
                     volume: 1.0,
                     lang: "en-GB",
@@ -131,13 +92,7 @@ export default function Home() {
                     console.log("Speech is ready", data);
                     speech.speak({
                         text: currentCaption,
-                        queue: false,
-                        // listeners: {
-                        //     onend: () => {
-                        //         videoRef.current.play();
-                        //         window.socket.send(JSON.stringify({ type: 'play', time: videoRef.current.currentTime }));
-                        //     }
-                        // }
+                        queue: false
                     }).catch(e => {
                         console.error("Error:", e)
                     })
@@ -149,7 +104,7 @@ export default function Home() {
     }
 
     useEffect(() => {
-        if(videoRef.current.duration) {
+        if (videoRef.current.duration) {
             setDuration(videoRef.current.duration);
         }
 
@@ -158,14 +113,14 @@ export default function Home() {
                 setTimestamp(videoRef.current.currentTime);
             }
 
-            if(`http://localhost:3000/${video}/${video}.mp4` !== videoRef.current.src) {
-                if(videoRef.current.duration) {
+            if (`http://localhost:3000/${video}/${video}.mp4` !== videoRef.current.src) {
+                if (videoRef.current.duration) {
                     setDuration(videoRef.current.duration);
                 }
                 setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
-                setCurrentCaption("");
-                setSimplified(false);
-                setCurrentCaptionIndex(0);
+                // setCurrentCaption("");
+                // setSimplified(false);
+                // setCurrentCaptionIndex(0);
             }
         };
 
@@ -177,12 +132,13 @@ export default function Home() {
     }, [timestamp, video]);
 
     useEffect(() => {
-        if(simplified) {
-            if(video === "bbc_space") {
+        if (simplified) {
+            if (video === "bbc_space") {
                 for (const element of bbc_space_simplified_captions.captions) {
                     if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                         setCurrentCaptionIndex(bbc_space_simplified_captions.captions.indexOf(element))
                         setCurrentCaption(element.text);
+
                         if (element.speaker === "presenter") {
                             setTextColor("text-white")
                         } else if (element.speaker === "speaker") {
@@ -192,14 +148,18 @@ export default function Home() {
                         } else {
                             setTextColor("text-white")
                         }
-                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+
+                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                        }
                     }
                 }
-            } else if(video === "university_challenge") {
+            } else if (video === "university_challenge") {
                 for (const element of university_challenge_simplified_captions.captions) {
                     if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                         setCurrentCaptionIndex(university_challenge_simplified_captions.captions.indexOf(element))
                         setCurrentCaption(element.text);
+
                         if (element.speaker === "presenter") {
                             setTextColor("text-white")
                         } else if (element.speaker === "speaker") {
@@ -209,32 +169,40 @@ export default function Home() {
                         } else {
                             setTextColor("text-white")
                         }
-                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                        }
                     }
                 }
             }
         } else {
-            if(video === "bbc_space") {
+            if (video === "bbc_space") {
                 for (const element of bbc_space_captions.captions) {
                     if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                         setCurrentCaptionIndex(bbc_space_captions.captions.indexOf(element))
                         setCurrentCaption(element.text);
                         setTextColor("text-white");
-                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+
+                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                        }
                     }
                 }
-            } else if(video === "university_challenge") {
+            } else if (video === "university_challenge") {
                 for (const element of university_challenge_captions.captions) {
                     if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                         setCurrentCaptionIndex(university_challenge_captions.captions.indexOf(element))
                         setCurrentCaption(element.text);
                         setTextColor("text-white");
-                        window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+
+                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
+                        }
                     }
                 }
             }
         }
-    }, [timestamp, simplified, textColor, video])
+    }, [timestamp, simplified, textColor, video, currentCaption])
 
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-4 auto-rows-max m-auto">
@@ -247,9 +215,9 @@ export default function Home() {
             </video>
             <div className="mx-auto w-3/5 py-4 text-center row-span-2 flex flex-col">
                 <div className="pb-6 align-end">
-                    <button className="px-5 py-3" onClick={handleBack}>Go back ⬅</button>
+                    <button className="px-5 py-3" onClick={handleBack}>⬅ Go back</button>
                     <button className="px-5 py-3" onClick={handleSimplifyCaptions}>Simple Captions: {simplified ? "👍" : "👎"}</button>
-                    {simplified && <button className="px-5 py-3" onClick={() => handleReadOut(true)}>Read out 🔊</button>} 
+                    {simplified && <button className="px-5 py-3" onClick={() => handleReadOut(true)}>Read out 🔊</button>}
                 </div>
             </div>
             <div className="mx-auto w-3/5 py-4">

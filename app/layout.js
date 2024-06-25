@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import './globals.css';
 
 export default function RootLayout({ children }) {
+
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const socket = new WebSocket('ws://192.168.1.87:8080');
@@ -12,12 +13,12 @@ export default function RootLayout({ children }) {
 				console.log('Connected to WebSocket server');
 			};
 
-			socket.onmessage = (event) => {
+			socket.addEventListener("message", (event) => {
 				const data = JSON.parse(event.data);
 				const video = document.querySelector('video');
 				const speechAudioRef = document.querySelector("#speechAudio");
 				const backgroundAudioRef = document.querySelector("#backgroundAudio");
-				
+
 				if (data.type === "play") {
 					video.currentTime = data.time;
 					video.play();
@@ -33,32 +34,40 @@ export default function RootLayout({ children }) {
 					video.spellcheck = data.readOut;
 				} else if (data.type === "toggleBackground") {
 					video.spellcheck = data.toggleBackground;
+					if (data.toggleBackground) {
+						speechAudioRef.volume = 1
+						backgroundAudioRef.volume = 1
+					} else {
+						speechAudioRef.volume = parseFloat(data.speechVolume) / 100;
+						backgroundAudioRef.volume = parseFloat(data.backgroundVolume) / 100;
+					}
 				} else if (data.type === "handleSpeechVolume") {
 					speechAudioRef.volume = parseFloat(data.speechVolume) / 100;
 				} else if (data.type === "handleBackgroundVolume") {
 					backgroundAudioRef.volume = parseFloat(data.backgroundVolume) / 100;
 				} else if (data.type === "playAll") {
-					video.currentTime = data.time;
-					speechAudioRef.currentTime = data.time;
-					backgroundAudioRef.currentTime = data.time;
 					video.play();
 					speechAudioRef.play();
 					backgroundAudioRef.play();
 				} else if (data.type === "pauseAll") {
-					video.currentTime = data.time;
-					speechAudioRef.currentTime = data.time;
-					backgroundAudioRef.currentTime = data.time;
 					video.pause();
 					speechAudioRef.pause();
 					backgroundAudioRef.pause();
 				} else if (data.type === "seekAll") {
-					video.currentTime = data.time;
-					speechAudioRef.currentTime = data.time;
-					backgroundAudioRef.currentTime = data.time;
+					video.currentTime = data.time
+					speechAudioRef.currentTime = data.time
+					backgroundAudioRef.currentTime = data.time
 				} else if (data.type === "selectVideo") {
 					video.src = `/${data.video}/${data.video}.mp4`;
+					video.textContent = `~~${data.simplified}~~${data.textColor}`;
+				} else if (data.type === "slowDown") {
+					video.muted = true;
+				} else if (data.type === "back10") {
+					video.currentTime = data.time
+					speechAudioRef.currentTime = data.time
+					backgroundAudioRef.currentTime = data.time
 				}
-			};
+			});
 
 			window.socket = socket;
 		}

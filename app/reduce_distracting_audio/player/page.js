@@ -67,11 +67,11 @@ export default function Home() {
                     Quiz Show
                 </button>
             </div>
-            <video ref={videoRef} controls muted className="mx-auto w-3/5" src={`/${video}/${video}.mp4`} type="video/mp4">
+            <video id="videoPlayer" ref={videoRef} controls muted className="mx-auto w-3/5" src={`/${video}/${video}.mp4`} type="video/mp4">
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
-            <audio id="speechAudio" src={`/${video}/${video}_speech_LONGER.mp3`} type="audio/mpeg" ref={speechRef} muted={muted}></audio>
-            <audio id="backgroundAudio" src={`/${video}/${video}_background_LONGER.mp3`} type="audio/mpeg" ref={backgroundRef} muted={muted}></audio>
+            <audio id="speechAudio" src={`/${video}/${video}_speech.mp3`} type="audio/mpeg" ref={speechRef} muted={muted}></audio>
+            <audio id="backgroundAudio" src={`/${video}/${video}_background.mp3`} type="audio/mpeg" ref={backgroundRef} muted={muted}></audio>
             <div>
                 <button onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
             </div>

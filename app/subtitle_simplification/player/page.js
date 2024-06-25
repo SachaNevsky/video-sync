@@ -10,34 +10,35 @@ export default function Page() {
     const [simplified, setSimplified] = useState(false);
     const [textColor, setTextColor] = useState("text-white");
     const [muted, setMuted] = useState(true);
-    const [video, setVideo] = useState("bbc_space")
+    const [video, setVideo] = useState("bbc_space");
 
     const handleMuted = () => {
         setMuted(!muted);
     }
 
     const selectVideo = (newVideo) => {
-        if(window.socket !== undefined && window.socket.readyState === socket.OPEN) {
+        if (window.socket !== undefined && window.socket.readyState === socket.OPEN) {
             setVideo(newVideo);
             window.socket.send(JSON.stringify({ type: 'selectVideo', video: newVideo }));
         }
     }
 
     useEffect(() => {
-        if(`/${video}/${video}.mp4` !== videoRef.current.src) {
-            selectVideo(video)
+        if (`/${video}/${video}.mp4` !== videoRef.current.src) {
+            selectVideo(video);
+            setCaptions("");
         }
     }, [video])
 
     useEffect(() => {
-        const toBool = (text) => {return String(text).toLowerCase() === "true"};
+        const toBool = (text) => { return String(text).toLowerCase() === "true" };
 
         const handleReadOut = () => {
             if (videoRef.current.textContent.split("~~")[0] !== "") {
-                videoRef.current.pause();
-                window.socket.send(JSON.stringify({ type: 'pause' }));
+                // videoRef.current.pause();
+                // window.socket.send(JSON.stringify({ type: 'pause' }));
                 const speech = new Speech();
-    
+
                 speech.init({
                     volume: 1.0,
                     lang: "en-GB",
@@ -67,7 +68,7 @@ export default function Page() {
                 setCaptions(videoRef.current.textContent.split("~~")[0]);
                 setSimplified(toBool(videoRef.current.textContent.split("~~")[1]));
                 setTextColor(videoRef.current.textContent.split("~~")[2]);
-                if(videoRef.current.spellcheck) {
+                if (videoRef.current.spellcheck) {
                     handleReadOut();
                 }
             }
@@ -106,14 +107,14 @@ export default function Page() {
             </div>
             <div className="mx-auto w-3/5 py-4 text-center grid-start-10 row-span-2">
                 {videoRef.current && simplified ? (
-                        <div className={textColor + " max-w-[60ch] m-auto text-3xl font-medium"}>
-                            {captions}
-                        </div>
-                    ) : (
-                        <div className={"max-w-[51ch] m-auto text-3xl font-medium"}>
-                            {captions}
-                        </div>
-                    )
+                    <div className={textColor + " max-w-[60ch] m-auto text-3xl font-medium"}>
+                        {captions}
+                    </div>
+                ) : (
+                    <div className={"max-w-[51ch] m-auto text-3xl font-medium"}>
+                        {captions}
+                    </div>
+                )
                 }
             </div>
             <div className="mx-auto w-3/5 py-4 text-center grid-start-11">

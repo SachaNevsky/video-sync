@@ -1,17 +1,124 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from "react";
+import Speech from "speak-tts";
 
 export default function Page() {
-    
-  const pathname = usePathname();
-  return (
-        <div className="bg-black py-4 h-screen text-white text-center grid m-auto">
+
+    const videoRef = useRef(null);
+    const speechRef = useRef(null);
+    const backgroundRef = useRef(null);
+
+    const [captions, setCaptions] = useState("");
+    const [timestamp, setTimestamp] = useState(0);
+    const [simplified, setSimplified] = useState(false);
+    const [textColor, setTextColor] = useState("text-white");
+    const [muted, setMuted] = useState(true);
+    const [video, setVideo] = useState("bbc_space");
+
+    const handleMuted = () => {
+        setMuted(!muted);
+    }
+
+    const selectVideo = (newVideo) => {
+        if (window.socket !== undefined && window.socket.readyState === socket.OPEN) {
+            setVideo(newVideo);
+            window.socket.send(JSON.stringify({ type: 'selectVideo', video: newVideo }));
+        }
+    }
+
+    useEffect(() => {
+        if (`/${video}/${video}.mp4` !== videoRef.current.src) {
+            selectVideo(video);
+            setCaptions("");
+        }
+    }, [video]);
+
+    useEffect(() => {
+        const toBool = (text) => { return String(text).toLowerCase() === "true" };
+
+        const handleReadOut = () => {
+            if (videoRef.current.textContent.split("~~")[0] !== "") {
+                const speech = new Speech();
+
+                speech.init({
+                    volume: 1.0,
+                    lang: "en-GB",
+                    rate: 1,
+                    pitch: 1
+                }).then(data => {
+                    speech.speak({
+                        text: videoRef.current.textContent.split("~~")[0],
+                        queue: false,
+                        listeners: {
+                            onend: () => {
+                                videoRef.current.spellcheck = false;
+                            }
+                        }
+                    }).catch(e => {
+                        console.error("Error:", e)
+                    })
+                }).catch(e => {
+                    console.error("Error initialising speech:", e)
+                })
+            }
+        }
+
+        const checkTime = () => {
+            if (videoRef.current.currentTime !== timestamp) {
+                setTimestamp(videoRef.current.currentTime);
+                setCaptions(videoRef.current.textContent.split("~~")[0]);
+                setSimplified(toBool(videoRef.current.textContent.split("~~")[1]));
+                setTextColor(videoRef.current.textContent.split("~~")[2]);
+                if (videoRef.current.spellcheck) {
+                    handleReadOut();
+                }
+            }
+        };
+
+        const interval = setInterval(checkTime, 100);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [timestamp]);
+
+
+    return (
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
             <div className="pt-4">
                 <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-                <a href="/slower_speech/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
+                <a href="/subtitle_simplification/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
             </div>
-            {pathname}
+            <div className="mx-auto w-3/5 py-4">
+                <button onClick={() => selectVideo("bbc_space")}>
+                    BBC News
+                </button>
+                <button onClick={() => selectVideo("university_challenge")}>
+                    Quiz Show
+                </button>
+            </div>
+            <video ref={videoRef} controls muted className="mx-auto w-3/5 row-span-7 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">
+                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
+            </video>
+            <audio id="speechAudio" src={`/${video}/${video}_speech.mp3`} type="audio/mpeg" ref={speechRef} muted={muted}></audio>
+            <audio id="backgroundAudio" src={`/${video}/${video}_background.mp3`} type="audio/mpeg" ref={backgroundRef} muted={muted}></audio>
+            <div className="mx-auto w-3/5 py-4 text-center grid-start-10 row-span-2">
+                {videoRef.current && simplified ? (
+                    <div className={textColor + " max-w-[60ch] m-auto text-3xl font-medium"}>
+                        {captions}
+                    </div>
+                ) : (
+                    <div className={"max-w-[51ch] m-auto text-3xl font-medium"}>
+                        {captions}
+                    </div>
+                )
+                }
+            </div>
+            <div className="mx-auto w-3/5 py-4 text-center grid-start-11">
+                <button onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
+                {videoRef.current && videoRef.current.timestamp ? (<p>{videoRef.current.timestamp}</p>) : (<p></p>)}
+            </div>
         </div>
     );
 }
