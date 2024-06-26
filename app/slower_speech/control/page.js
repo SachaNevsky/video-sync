@@ -70,7 +70,7 @@ export default function Page() {
                 }
                 setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
                 setCurrentCaption("");
-                setSimplified(false);
+                setSlowDown(false);
                 setCurrentCaptionIndex(0);
             }
         };

@@ -41,19 +41,23 @@ export default function Page() {
                 const ttsDuration = parseFloat(videoRef.current.textContent.split("~~")[2])
 
                 window.socket.send(JSON.stringify({ type: 'playback', playback: duration/ttsDuration }));
-
+                // window.socket.send(JSON.stringify({ type: 'playback', playback: 0.3 }));
+                // console.log()
                 speech.init({
                     volume: 1.0,
                     lang: "en-GB",
-                    rate: 1,
-                    pitch: 1
+                    rate: 1.1,
+                    pitch: 1,
+                    splitSentences: false,
                 }).then(data => {
                     speech.speak({
                         text: toRead,
-                        queue: false,
+                        queue: true, // don't interupt if not finished
                         listeners: {
                             onend: (event) => {
-                                videoRef.current.spellcheck = false;
+                                // console.log(toRead)
+                                // console.log(event.elapsedTime.toFixed(1));
+                                // videoRef.current.spellcheck = false;
                                 window.socket.send(JSON.stringify({ type: 'playback', playback: 1 }));
                             }
                         }
@@ -102,7 +106,7 @@ export default function Page() {
                     Quiz Show
                 </button>
             </div>
-            <video ref={videoRef} controls muted={muted} className="mx-auto w-3/5 row-span-7 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">
+            <video ref={videoRef} controls muted={muted} className="mx-auto w-3/5 row-span-8 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
             <div className="mx-auto w-3/5 py-4 text-center grid-start-11">
