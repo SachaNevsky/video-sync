@@ -1,10 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
-import Speech from "speak-tts";
-import bbc_space_simplified_captions from "/public/bbc_space/bbc_space_simplified.json";
 import bbc_space_captions from "/public/bbc_space/bbc_space.json";
-import university_challenge_simplified_captions from "/public/university_challenge/university_challenge_simplified.json"
 import university_challenge_captions from "/public/university_challenge/university_challenge.json"
 
 export default function Page() {
@@ -24,14 +21,17 @@ export default function Page() {
     }
 
     const handlePlay = () => {
-        videoRef.current.play();
-        window.socket.send(JSON.stringify({ type: 'play', time: videoRef.current.currentTime }));
+        window.socket.send(JSON.stringify({ type: 'play' }));
     };
 
     const handlePause = () => {
-        videoRef.current.pause();
         window.socket.send(JSON.stringify({ type: 'pause' }));
     };
+
+    const handleBack = () => {
+        const time = videoRef.current.currentTime - 10;
+        window.socket.send(JSON.stringify({ type: 'back10', time: time }));
+    }
 
     const handleSeek = (event) => {
         const time = parseFloat(event.target.value);
@@ -42,66 +42,17 @@ export default function Page() {
 
     const handleSlowDown = () => {
         setSlowDown(!slowDown)
-    }
-
-    const handleBack = () => {
-        if (currentCaptionIndex > 0) {
-            let newTime = 0;
-
-            if (video === "bbc_space") {
-                if (!simplified) {
-                    newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start);
-                } else {
-                    newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start);
-                }
-            } else if (video === "university_challenge") {
-                if (!simplified) {
-                    newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start);
-                } else {
-                    newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start);
-                }
-            }
-
-            setCurrentCaptionIndex(currentCaptionIndex - 1);
-            setTimestamp(newTime);
-            videoRef.current.currentTime = newTime;
-            videoRef.current.pause();
-            window.socket.send(JSON.stringify({ type: 'seek', time: newTime }));
-            window.socket.send(JSON.stringify({ type: 'pause' }));
+        window.socket.send(JSON.stringify({ type: 'mute', mute: slowDown }));
+        if(!slowDown) {
+            window.socket.send(JSON.stringify({ type: 'playback', playback: 1 }));
         }
-
     }
 
-    const handleReadOut = (playerSpeaker) => {
+    useEffect(() => {
         if (currentCaption !== "") {
-            if (playerSpeaker) {
-                videoRef.current.pause();
-                window.socket.send(JSON.stringify({ type: 'pause' }));
-                window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
-            } else {
-                videoRef.current.pause();
-                window.socket.send(JSON.stringify({ type: 'pause' }));
-                const speech = new Speech();
-
-                speech.init({
-                    volume: 1.0,
-                    lang: "en-GB",
-                    rate: 1,
-                    pitch: 1
-                }).then(data => {
-                    console.log("Speech is ready", data);
-                    speech.speak({
-                        text: currentCaption,
-                        queue: false
-                    }).catch(e => {
-                        console.error("Error:", e)
-                    })
-                }).catch(e => {
-                    console.error("Error initialising speech:", e)
-                })
-            }
+            window.socket.send(JSON.stringify({ type: 'readOut', readOut: true }));
         }
-    }
+    })
 
     useEffect(() => {
         if (videoRef.current.duration) {
@@ -118,9 +69,9 @@ export default function Page() {
                     setDuration(videoRef.current.duration);
                 }
                 setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
-                // setCurrentCaption("");
-                // setSimplified(false);
-                // setCurrentCaptionIndex(0);
+                setCurrentCaption("");
+                setSimplified(false);
+                setCurrentCaptionIndex(0);
             }
         };
 
@@ -140,7 +91,8 @@ export default function Page() {
                     setTextColor("text-white");
 
                     if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
-                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, textColor: textColor }));
+                        console.log(element.end, element.start)
+                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, duration: parseFloat(convertTime(element.end)) - parseFloat(convertTime(element.start)), ttsDuration: element.tts_duration }));
                     }
                 }
             }
@@ -152,7 +104,7 @@ export default function Page() {
                     setTextColor("text-white");
 
                     if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
-                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, textColor: textColor }));
+                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, duration: parseFloat(convertTime(element.end)) - parseFloat(convertTime(element.start)), ttsDuration: element.tts_duration }));
                     }
                 }
             }
@@ -163,16 +115,15 @@ export default function Page() {
         <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-4 auto-rows-max m-auto">
             <div className="pt-4">
                 <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-                <a href="/subtitle_simplification/player" className="m-auto px-5 py-3 mx-3">Player 📺</a>
+                <a href="/slower_speech/player" className="m-auto px-5 py-3 mx-3">Player 📺</a>
             </div>
-            <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
+            <video ref={videoRef} controls muted={true} className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
             <div className="mx-auto w-3/5 py-4 text-center row-span-2 flex flex-col">
                 <div className="pb-6 align-end">
                     <button className="px-5 py-3" onClick={handleBack}>⬅ Go back</button>
                     <button className="px-5 py-3" onClick={handleSlowDown}>Slow down: {slowDown ? "👍" : "👎"}</button>
-                    {/* {simplified && <button className="px-5 py-3" onClick={() => handleReadOut(true)}>Read out 🔊</button>} */}
                 </div>
             </div>
             <div className="mx-auto w-3/5 py-4">

@@ -20,7 +20,6 @@ export default function RootLayout({ children }) {
 				const backgroundAudioRef = document.querySelector("#backgroundAudio");
 
 				if (data.type === "play") {
-					video.currentTime = data.time;
 					video.play();
 				} else if (data.type === "pause") {
 					video.pause();
@@ -61,11 +60,25 @@ export default function RootLayout({ children }) {
 					video.src = `/${data.video}/${data.video}.mp4`;
 					video.textContent = `~~${data.simplified}~~${data.textColor}`;
 				} else if (data.type === "slowDown") {
-					video.muted = true;
+					if(data.slowDown) {
+						video.volume = 0;
+						video.spellcheck = data.slowDown;
+						video.textContent = `${data.caption}~~${data.duration}~~${data.ttsDuration}`;
+					} else {
+						video.volume = 1;
+					}
 				} else if (data.type === "back10") {
 					video.currentTime = data.time
-					speechAudioRef.currentTime = data.time
-					backgroundAudioRef.currentTime = data.time
+					if(speechAudioRef && backgroundAudioRef) {
+						speechAudioRef.currentTime = data.time
+						backgroundAudioRef.currentTime = data.time
+					}
+				} else if (data.type === "mute") {
+					if(data.mute) {
+						video.volume = 1;
+					} else {
+						video.volume = 0;
+					}
 				}
 			});
 
