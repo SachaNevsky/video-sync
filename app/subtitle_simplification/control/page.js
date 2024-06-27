@@ -6,6 +6,7 @@ import bbc_space_simplified_captions from "/public/bbc_space/bbc_space_simplifie
 import bbc_space_captions from "/public/bbc_space/bbc_space.json";
 import university_challenge_simplified_captions from "/public/university_challenge/university_challenge_simplified.json"
 import university_challenge_captions from "/public/university_challenge/university_challenge.json"
+import the_chase_captions from "/public/the_chase/the_chase.json"
 
 export default function Home() {
     const [timestamp, setTimestamp] = useState(0);
@@ -15,6 +16,7 @@ export default function Home() {
     const [simplified, setSimplified] = useState(false);
     const [currentCaptionIndex, setCurrentCaptionIndex] = useState(0);
     const [video, setVideo] = useState("bbc_space");
+    const [captions, setCaptions] = useState(bbc_space_captions.captions)
 
     const videoRef = useRef(null);
 
@@ -46,22 +48,23 @@ export default function Home() {
 
     const handleBack = () => {
         if (currentCaptionIndex > 0) {
-            let newTime = 0;
+            // let newTime = 0;
 
-            if (video === "bbc_space") {
-                if (!simplified) {
-                    newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start);
-                } else {
-                    newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start);
-                }
-            } else if (video === "university_challenge") {
-                if (!simplified) {
-                    newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start);
-                } else {
-                    newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start);
-                }
-            }
+            // if (video === "bbc_space") {
+            //     if (!simplified) {
+            //         newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start);
+            //     } else {
+            //         newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start);
+            //     }
+            // } else if (video === "university_challenge") {
+            //     if (!simplified) {
+            //         newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start);
+            //     } else {
+            //         newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start);
+            //     }
+            // }
 
+            const newTime = convertTime(captions[currentCaptionIndex - 1].start)
             setCurrentCaptionIndex(currentCaptionIndex - 1);
             setTimestamp(newTime);
             videoRef.current.currentTime = newTime;
@@ -69,7 +72,6 @@ export default function Home() {
             window.socket.send(JSON.stringify({ type: 'seek', time: newTime }));
             window.socket.send(JSON.stringify({ type: 'pause' }));
         }
-
     }
 
     const handleReadOut = (playerSpeaker) => {
@@ -104,6 +106,28 @@ export default function Home() {
     }
 
     useEffect(() => {
+        if (video === "bbc_space") {
+            if(simplified) {
+                setCaptions(bbc_space_simplified_captions.captions)
+            } else {
+                setCaptions(bbc_space_captions.captions)
+            }
+        } else if (video === "university_challenge") {
+            if(simplified) {
+                setCaptions(university_challenge_simplified_captions.captions)
+            } else {
+                setCaptions(university_challenge_captions.captions)
+            }
+        } else if (video === "the_chase") {
+            if(simplified) {
+                setCaptions(the_chase_simplified_captions.captions)
+            } else {
+                setCaptions(the_chase_captions.captions)
+            }
+        }
+    }, [video, simplified])
+
+    useEffect(() => {
         if (videoRef.current.duration) {
             setDuration(videoRef.current.duration);
         }
@@ -118,9 +142,6 @@ export default function Home() {
                     setDuration(videoRef.current.duration);
                 }
                 setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
-                // setCurrentCaption("");
-                // setSimplified(false);
-                // setCurrentCaptionIndex(0);
             }
         };
 
@@ -132,77 +153,27 @@ export default function Home() {
     }, [timestamp, video]);
 
     useEffect(() => {
-        if (simplified) {
-            if (video === "bbc_space") {
-                for (const element of bbc_space_simplified_captions.captions) {
-                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                        setCurrentCaptionIndex(bbc_space_simplified_captions.captions.indexOf(element))
-                        setCurrentCaption(element.text);
+        for (const element of captions) {
+            if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                setCurrentCaptionIndex(captions.indexOf(element))
+                setCurrentCaption(element.text);
 
-                        if (element.speaker === "presenter") {
-                            setTextColor("text-white")
-                        } else if (element.speaker === "speaker") {
-                            setTextColor("text-yellow-300")
-                        } else if (element.speaker === "interviewee") {
-                            setTextColor("text-sky-500")
-                        } else {
-                            setTextColor("text-white")
-                        }
-
-                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
-                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
-                        }
-                    }
+                if (element.speaker === "presenter") {
+                    setTextColor("text-white")
+                } else if (element.speaker === "speaker") {
+                    setTextColor("text-yellow-300")
+                } else if (element.speaker === "interviewee") {
+                    setTextColor("text-sky-500")
+                } else {
+                    setTextColor("text-white")
                 }
-            } else if (video === "university_challenge") {
-                for (const element of university_challenge_simplified_captions.captions) {
-                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                        setCurrentCaptionIndex(university_challenge_simplified_captions.captions.indexOf(element))
-                        setCurrentCaption(element.text);
 
-                        if (element.speaker === "presenter") {
-                            setTextColor("text-white")
-                        } else if (element.speaker === "speaker") {
-                            setTextColor("text-yellow-300")
-                        } else if (element.speaker === "interviewee") {
-                            setTextColor("text-sky-500")
-                        } else {
-                            setTextColor("text-white")
-                        }
-                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
-                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
-                        }
-                    }
-                }
-            }
-        } else {
-            if (video === "bbc_space") {
-                for (const element of bbc_space_captions.captions) {
-                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                        setCurrentCaptionIndex(bbc_space_captions.captions.indexOf(element))
-                        setCurrentCaption(element.text);
-                        setTextColor("text-white");
-
-                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
-                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
-                        }
-                    }
-                }
-            } else if (video === "university_challenge") {
-                for (const element of university_challenge_captions.captions) {
-                    if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                        setCurrentCaptionIndex(university_challenge_captions.captions.indexOf(element))
-                        setCurrentCaption(element.text);
-                        setTextColor("text-white");
-
-                        if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
-                            window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
-                        }
-                    }
+                if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                    window.socket.send(JSON.stringify({ type: 'caption', caption: element.text, simplified: simplified, textColor: textColor }));
                 }
             }
         }
-    }, [timestamp, simplified, textColor, video, currentCaption])
+    }, [timestamp, simplified, textColor, video, currentCaption, captions])
 
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-3 auto-rows-max m-auto">

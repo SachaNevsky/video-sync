@@ -84,14 +84,14 @@ export default function Page() {
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
             <div className="pt-4">
-                <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-                <a href="/subtitle_simplification/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
+                <a href="/" className="m-auto px-8 py-5 mx-3">Home 🏠</a>
+                <a href="/subtitle_simplification/control" className="m-auto px-8 py-5 mx-3">Controls ⚙</a>
             </div>
             <div className="mx-auto w-3/5 py-4">
-                <button onClick={() => selectVideo("bbc_space")}>
+                <button className="px-8 py-5" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
-                <button onClick={() => selectVideo("university_challenge")}>
+                <button className="px-8 py-5" onClick={() => selectVideo("the_chase")}>
                     Quiz Show
                 </button>
             </div>

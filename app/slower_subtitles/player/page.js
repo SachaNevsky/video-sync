@@ -17,23 +17,22 @@ export default function Page() {
     }
 
     const selectVideo = (newVideo) => {
-        if(window.socket !== undefined && window.socket.readyState === socket.OPEN) {
+        if (window.socket !== undefined && window.socket.readyState === socket.OPEN) {
             setVideo(newVideo);
             window.socket.send(JSON.stringify({ type: 'selectVideo', video: newVideo }));
         }
     }
 
     useEffect(() => {
-        if(`/${video}/${video}.mp4` !== videoRef.current.src) {
+        if (`/${video}/${video}.mp4` !== videoRef.current.src) {
             selectVideo(video)
         }
     }, [video])
 
-	useEffect(() => {
-
-		const checkTime = () => {
+    useEffect(() => {
+        const checkTime = () => {
             if (videoRef.current.currentTime !== timestamp) {
-				console.log(videoRef.current.playbackRate);
+                console.log(videoRef.current.playbackRate);
                 setTimestamp(videoRef.current.currentTime);
             }
         };
@@ -43,7 +42,7 @@ export default function Page() {
         return () => {
             clearInterval(interval);
         };
-	}, [timestamp]);
+    }, [timestamp]);
 
     // useEffect(() => {
     //     const toBool = (text) => {return String(text).toLowerCase() === "true"};
@@ -53,7 +52,7 @@ export default function Page() {
     //             videoRef.current.pause();
     //             window.socket.send(JSON.stringify({ type: 'pause' }));
     //             const speech = new Speech();
-    
+
     //             speech.init({
     //                 volume: 1.0,
     //                 lang: "en-GB",
@@ -97,20 +96,20 @@ export default function Page() {
     // }, [timestamp]);
 
     return (
-        <div className="bg-black py-4 h-screen text-white text-center grid m-auto">
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
             <div className="pt-4">
-                <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-                <a href="/slower_subtitles/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
+                <a href="/" className="m-auto px-8 py-5 mx-3">Home 🏠</a>
+                <a href="/slower_subtitles/control" className="m-auto px-8 py-5 mx-3">Controls ⚙</a>
             </div>
             <div className="mx-auto w-3/5 py-4">
-                <button onClick={() => selectVideo("bbc_space")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
-                <button onClick={() => selectVideo("university_challenge")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
                     Quiz Show
                 </button>
             </div>
-            <div className="mx-auto w-3/5 py-4 text-center">
+            <div className="mx-auto w-3/5 py-4 text-center row-span-8">
                 <video ref={videoRef} controls muted={muted} src={`/${video}/${video}.mp4`} type="video/mp4" className="h-full mx-auto">
                     <track
                         id="subtitles"
@@ -121,7 +120,7 @@ export default function Page() {
                 </video>
             </div>
             <div className="mx-auto w-3/5 py-4 text-center">
-                <button onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
+                <button className="py-5 px-8" onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
             </div>
         </div>
     );

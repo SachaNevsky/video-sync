@@ -54,26 +54,26 @@ export default function Home() {
     }, [timestamp, speechVolume, backgroundVolume]);
 
     return (
-        <div className="bg-black py-4 h-screen text-white text-center grid m-auto">
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
             <div className="pt-4">
-                <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-                <a href="/reduce_distracting_audio/control" className="m-auto px-5 py-3 mx-3">Controls ⚙</a>
+                <a href="/" className="m-auto px-8 py-5 mx-3">Home 🏠</a>
+                <a href="/reduce_distracting_audio/control" className="m-auto px-8 py-5 mx-3">Controls ⚙</a>
             </div>
             <div className="mx-auto w-3/5 py-4">
-                <button onClick={() => selectVideo("bbc_space")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
-                <button onClick={() => selectVideo("university_challenge")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
                     Quiz Show
                 </button>
             </div>
-            <video id="videoPlayer" ref={videoRef} controls muted className="mx-auto w-3/5" src={`/${video}/${video}.mp4`} type="video/mp4">
+            <video id="videoPlayer" ref={videoRef} controls muted className="mx-auto w-3/5 row-span-8 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
             <audio id="speechAudio" src={`/${video}/${video}_speech.mp3`} type="audio/mpeg" ref={speechRef} muted={muted}></audio>
             <audio id="backgroundAudio" src={`/${video}/${video}_background.mp3`} type="audio/mpeg" ref={backgroundRef} muted={muted}></audio>
-            <div>
-                <button onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
+            <div className="mx-auto w-3/5 py-4 text-center">
+                <button className="py-5 px-8" onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
             </div>
         </div>
     );

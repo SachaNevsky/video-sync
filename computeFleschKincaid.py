@@ -1,6 +1,4 @@
 import json
-from readability import Readability
-import math
 import re
 
 VC = re.compile('[aeiou]+[^aeiou]+', re.I)

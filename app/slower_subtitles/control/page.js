@@ -13,6 +13,7 @@ export default function Home() {
     const [magnitude, setMagnitude] = useState(0.03);
     const [captions, setCaptions] = useState(bbc_space_captions);
     const [video, setVideo] = useState("bbc_space");
+    const [grade, setGrade] = useState(8);
 
 	const videoRef = useRef(null);
 
@@ -38,6 +39,7 @@ export default function Home() {
     }
 
     const handleMagnitude = (event) => {
+        setGrade(11 - Math.floor(event.target.value * 100))
         setMagnitude(event.target.value)
     }
 
@@ -79,11 +81,10 @@ export default function Home() {
         }
         
         for(const element of captions.captions) {
-            console.log(element)
             if(parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                 setCaption(element.text)
-                if(slowMode && parseInt(element.flesch_kincaid) >= 8) {
-                    const reduce = Math.min((element.flesch_kincaid - 7) * magnitude, 11 * magnitude);
+                if(slowMode && parseInt(element.flesch_kincaid) >= grade) {
+                    const reduce = Math.min((element.flesch_kincaid - (grade - 1)) * magnitude, 11 * magnitude);
                     setPlayback(1 - reduce);
                     console.log("Slowed:", element.flesch_kincaid, playback)
                     videoRef.current.playbackRate = playback;
@@ -95,7 +96,7 @@ export default function Home() {
                 }
             }
         }
-    }, [timestamp, slowMode, magnitude, playback, video, captions])
+    }, [timestamp, slowMode, magnitude, playback, video, captions, grade])
 
     return (
 		<div className="bg-black py-4 h-screen text-white text-center grid grid-rows-3 auto-rows-max m-auto">
@@ -112,7 +113,7 @@ export default function Home() {
                 </div>
                 {slowMode && 
                     <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
-                        <label for="magnitude" className="px-4">Weak </label>
+                        <label className="px-4">Weak </label>
                         <input
                             name="magnitude"
                             className="w-full"
@@ -122,7 +123,7 @@ export default function Home() {
                             step={0.005}
                             onChange={handleMagnitude}
                         />
-                        <label for="magnitude" className="px-4"> Strong</label>
+                        <label className="px-4"> Strong</label>
                     </div>
                 }
             </div>
