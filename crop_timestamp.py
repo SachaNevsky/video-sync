@@ -39,9 +39,9 @@ def subtract_time_from_vtt(file_path, output_path, time_to_subtract):
                 file.write(line)
 
 # Usage
-name = "the_chase"
+name = "industry"
 input_file = f"./public/{name}/{name}.vtt"
 output_file = f"./public/{name}/{name}_cropped.vtt"
-time_to_subtract = timedelta(minutes=4, seconds=45)
+time_to_subtract = timedelta(minutes=0, seconds=22)
 
 subtract_time_from_vtt(input_file, output_file, time_to_subtract)
