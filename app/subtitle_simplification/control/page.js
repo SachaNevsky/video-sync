@@ -205,29 +205,31 @@ export default function Home() {
     }, [timestamp, simplified, textColor, video, currentCaption])
 
     return (
-        <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-4 auto-rows-max m-auto">
+        <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-3 auto-rows-max m-auto">
             <div className="pt-4">
-                <a href="/" className="m-auto px-5 py-3">Home 🏠</a>
-                <a href="/subtitle_simplification/player" className="m-auto px-5 py-3 mx-3">Player 📺</a>
+                <a className="m-auto px-8 py-5 mx-3" href="/">Home 🏠</a>
+                <a className="m-auto px-8 py-5 mx-3" href="/subtitle_simplification/player">Player 📺</a>
             </div>
             <video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
                 <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
             </video>
-            <div className="mx-auto w-3/5 py-4 text-center row-span-2 flex flex-col">
-                <div className="pb-6 align-end">
-                    <button className="px-5 py-3" onClick={handleBack}>⬅ Go back</button>
-                    <button className="px-5 py-3" onClick={handleSimplifyCaptions}>Simple Captions: {simplified ? "👍" : "👎"}</button>
-                    {simplified && <button className="px-5 py-3" onClick={() => handleReadOut(true)}>Read out 🔊</button>}
+            <div className="mx-auto w-3/5 py-4 row-span-1">
+                <div className="pb-6 grid">
+                    <button className="px-8 py-5" onClick={handleSimplifyCaptions}>Simple Captions: {simplified ? "👍" : "👎"}</button>
+                </div>
+                <div className="pb-6 grid">
+                    {simplified && <button className="px-8 py-5" onClick={() => handleReadOut(true)}>Read out 🔊</button>}
                 </div>
             </div>
             <div className="mx-auto w-3/5 py-4">
-                <div className="pb-6">
-                    <button className="px-5 py-3" onClick={handlePlay}>Play ▶</button>
-                    <button className="px-5 py-3" onClick={handlePause}>Pause ⏸</button>
+                <div className="pb-6 grid grid-cols-3">
+                    <button className="px-8 py-5" onClick={handleBack}>⬅ Go back</button>
+                    <button className="px-8 py-5" onClick={handlePlay}>Play ▶</button>
+                    <button className="px-8 py-5" onClick={handlePause}>Pause ⏸</button>
                 </div>
                 <div>
                     <input
-                        className="mx-auto w-3/5"
+                        className="mx-auto w-full"
                         type="range"
                         min={0}
                         max={duration}

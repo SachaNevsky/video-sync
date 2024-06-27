@@ -100,20 +100,40 @@ export default function Home() {
     return (
 		<div className="bg-black py-4 h-screen text-white text-center grid grid-rows-3 auto-rows-max m-auto">
             <div className="pt-4">
-				<a href="/" className="m-auto px-5 py-3 mx-3">Home 🏠</a>
-                <a href="/slower_subtitles/player" className="m-auto px-5 py-3">Player 📺</a>
+				<a className="m-auto px-8 py-5 mx-3" href="/">Home 🏠</a>
+                <a className="m-auto px-8 py-5 mx-3" href="/slower_subtitles/player">Player 📺</a>
 			</div>
 			<video ref={videoRef} controls muted className="mx-auto w-3/5 hidden" src={`/${video}/${video}.mp4`} type="video/mp4">
 				<track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}_simplified.vtt`}/>
 			</video>
-			<div className="mx-auto w-3/5 py-4">
-                <div className="pb-6">
-                    <button className="px-5 py-3" onClick={handlePlay}>Play ▶</button>
-                    <button className="px-5 py-3" onClick={handlePause}>Pause ⏸</button>
+            <div className="mx-auto w-3/5 py-4">
+                <div className="pb-6 grid grid-cols-1">
+                    <button className="px-8 py-5" onClick={handleSlowMode}>Slow Mode: {slowMode ? "👍" : "👎"}</button>
+                </div>
+                {slowMode && 
+                    <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+                        <label for="magnitude" className="px-4">Weak </label>
+                        <input
+                            name="magnitude"
+                            className="w-full"
+                            type="range"
+                            min={0.01}
+                            max={0.05}
+                            step={0.005}
+                            onChange={handleMagnitude}
+                        />
+                        <label for="magnitude" className="px-4"> Strong</label>
+                    </div>
+                }
+            </div>
+            <div className="mx-auto w-3/5 py-4 ">
+                <div className="pb-6 grid grid-cols-2">
+                    <button className="px-8 py-5" onClick={handlePlay}>Play ▶</button>
+                    <button className="px-8 py-5" onClick={handlePause}>Pause ⏸</button>
                 </div>
                 <div>
                     <input
-                        className="mx-auto w-3/5"
+                        className="mx-auto w-full"
                         type="range"
                         min={0}
                         max={duration}
@@ -125,26 +145,6 @@ export default function Home() {
                         {Math.floor(timestamp/60)}:{('0'+parseInt(timestamp-Math.floor(timestamp/60) * 60)).slice(-2)} / {Math.floor(duration/60)}:{('0'+parseInt(duration-Math.floor(duration/60) * 60)).slice(-2)}
                     </div>
                 </div>
-            </div>
-            <div className="mx-auto w-3/5 py-4">
-                <div className="pb-6">
-                    <button className="px-5 py-3" onClick={handleSlowMode}>Slow Mode: {slowMode ? "👍" : "👎"}</button>
-                </div>
-                {slowMode && 
-                    <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
-                        <label for="magnitude" className="px-4">Weak </label>
-                        <input
-                            name="magnitude"
-                            className="w-3/5"
-                            type="range"
-                            min={0.01}
-                            max={0.05}
-                            step={0.005}
-                            onChange={handleMagnitude}
-                        />
-                        <label for="magnitude" className="px-4"> Strong</label>
-                    </div>
-                }
             </div>
 		</div>
 	);
