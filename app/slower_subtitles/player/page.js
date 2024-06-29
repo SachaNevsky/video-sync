@@ -105,19 +105,12 @@ export default function Page() {
                 <button className="py-5 px-8" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
-                <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("the_chase")}>
                     Quiz Show
                 </button>
             </div>
             <div className="mx-auto w-3/5 py-4 text-center row-span-8">
-                <video ref={videoRef} controls muted={muted} src={`/${video}/${video}.mp4`} type="video/mp4" className="h-full mx-auto">
-                    <track
-                        id="subtitles"
-                        label="Simplified"
-                        kind="subtitles"
-                        srcLang="en"
-                        src={`/${video}/${video}_simplified.vtt`} />
-                </video>
+                <video ref={videoRef} controls muted={muted} src={`/${video}/${video}.mp4`} type="video/mp4" className="h-full mx-auto"></video>
             </div>
             <div className="mx-auto w-3/5 py-4 text-center">
                 <button className="py-5 px-8" onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>

@@ -20,20 +20,20 @@ def write_json_file(data, file_path):
 def clean_text(text):
     return text.replace("\u00a0\n", " ").replace("\u2019", "'").replace("\n", " ").replace("  ", " ")
 
-filename = "./public/university_challenge/university_challenge.json"
-# filename = "./public/bbc_space/bbc_space.json"
+name = "the_chase"
+filename = f"./public/{name}/{name}_simplified.json"
 with open(filename, 'r', encoding="utf-8") as file:
     data = json.load(file)
 
 captions_with_fk = []
 for element in data["captions"]:
-    cleaned_text = clean_text(element["text"])
     caption = {
         "start": element["start"],
-        "end": element["end"],  # Fixed typo from element["start"] to element["end"]
-        "text": cleaned_text,
-        "flesch_kincaid": flesch_kincaid(cleaned_text),
-        "tts_duration": element["tts_duration"]
+        "end": element["end"],
+        "text": element["text"],
+        "flesch_kincaid": flesch_kincaid(element["text"]),
+        "duration": element["duration"],
+        "ttsDuration": element["ttsDuration"]
     }
     captions_with_fk.append(caption)
 

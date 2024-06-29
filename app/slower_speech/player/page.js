@@ -42,7 +42,7 @@ export default function Page() {
 
                 window.socket.send(JSON.stringify({ type: 'playback', playback: duration/ttsDuration }));
                 // window.socket.send(JSON.stringify({ type: 'playback', playback: 0.3 }));
-                // console.log()
+                console.log()
                 speech.init({
                     volume: 1.0,
                     lang: "en-GB",
@@ -57,7 +57,7 @@ export default function Page() {
                             onend: (event) => {
                                 // console.log(toRead)
                                 // console.log(event.elapsedTime.toFixed(1));
-                                // videoRef.current.spellcheck = false;
+                                videoRef.current.spellcheck = false;
                                 window.socket.send(JSON.stringify({ type: 'playback', playback: 1 }));
                             }
                         }
@@ -102,8 +102,11 @@ export default function Page() {
                 <button className="py-5 px-8" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
-                <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("the_chase")}>
                     Quiz Show
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("industry")}>
+                    Drama
                 </button>
             </div>
             <video ref={videoRef} controls muted={muted} className="mx-auto w-3/5 row-span-8 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">

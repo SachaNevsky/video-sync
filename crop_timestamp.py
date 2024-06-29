@@ -26,8 +26,8 @@ def subtract_time_from_vtt(file_path, output_path, time_to_subtract):
             if match:
                 start_time = parse_time_stamp(match.group(1))
                 end_time = parse_time_stamp(match.group(2))
-                new_start_time = start_time - time_to_subtract
-                new_end_time = end_time - time_to_subtract
+                new_start_time = start_time + time_to_subtract
+                new_end_time = end_time + time_to_subtract
                 # Ensure times are not negative
                 if new_start_time < timedelta(0):
                     new_start_time = timedelta(0)
@@ -42,6 +42,6 @@ def subtract_time_from_vtt(file_path, output_path, time_to_subtract):
 name = "industry"
 input_file = f"./public/{name}/{name}.vtt"
 output_file = f"./public/{name}/{name}_cropped.vtt"
-time_to_subtract = timedelta(minutes=0, seconds=22)
+time_to_subtract = timedelta(minutes=0, seconds=2, microseconds=5)
 
 subtract_time_from_vtt(input_file, output_file, time_to_subtract)

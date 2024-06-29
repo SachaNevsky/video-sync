@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import bbc_space_captions from "/public/bbc_space/bbc_space.json";
 import university_challenge_captions from "/public/university_challenge/university_challenge.json"
+import the_chase_captions from "/public/the_chase/the_chase.json"
+import industry_captions from "/public/industry/industry.json"
 
 export default function Page() {
     const [timestamp, setTimestamp] = useState(0);
-    const [textColor, setTextColor] = useState("text-white");
     const [duration, setDuration] = useState(0);
     const [currentCaption, setCurrentCaption] = useState("");
     const [slowDown, setSlowDown] = useState(false);
-    const [currentCaptionIndex, setCurrentCaptionIndex] = useState(0);
     const [video, setVideo] = useState("bbc_space");
 
     const videoRef = useRef(null);
@@ -71,7 +71,6 @@ export default function Page() {
                 setVideo(videoRef.current.src.split("/").at(-1).replace(".mp4", ""));
                 setCurrentCaption("");
                 setSlowDown(false);
-                setCurrentCaptionIndex(0);
             }
         };
 
@@ -86,9 +85,7 @@ export default function Page() {
         if (video === "bbc_space") {
             for (const element of bbc_space_captions.captions) {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                    setCurrentCaptionIndex(bbc_space_captions.captions.indexOf(element))
                     setCurrentCaption(element.text);
-                    setTextColor("text-white");
 
                     if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
                         console.log(element.end, element.start)
@@ -99,17 +96,35 @@ export default function Page() {
         } else if (video === "university_challenge") {
             for (const element of university_challenge_captions.captions) {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
-                    setCurrentCaptionIndex(university_challenge_captions.captions.indexOf(element))
                     setCurrentCaption(element.text);
-                    setTextColor("text-white");
 
                     if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
                         window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, duration: parseFloat(convertTime(element.end)) - parseFloat(convertTime(element.start)), ttsDuration: element.tts_duration }));
                     }
                 }
             }
+        } else if (video === "the_chase") {
+            for (const element of the_chase_captions.captions) {
+                if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                    setCurrentCaption(element.text);
+
+                    if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, duration: parseFloat(convertTime(element.end)) - parseFloat(convertTime(element.start)), ttsDuration: element.ttsDuration }));
+                    }
+                }
+            }
+        } else if (video === "industry") {
+            for (const element of industry_captions.captions) {
+                if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                    setCurrentCaption(element.text);
+
+                    if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, duration: element.duration, ttsDuration: element.ttsDuration }));
+                    }
+                }
+            }
         }
-    }, [timestamp, slowDown, textColor, video, currentCaption])
+    }, [timestamp, slowDown, video, currentCaption])
 
     return (
         <div className="bg-black py-4 h-screen text-white text-center grid grid-rows-3 auto-rows-max m-auto">
