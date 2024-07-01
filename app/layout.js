@@ -79,6 +79,24 @@ export default function RootLayout({ children }) {
 					} else {
 						video.volume = 0;
 					}
+				} else if (data.type === "reduceVisuals") {
+					original = document.querySelector("#original")
+					original.spellcheck = data.reduceVisuals;
+				} else if (data.type === "playBoth") {
+					original = document.querySelector("#original")
+					blurred = document.querySelector("#blurred")
+					original.play();
+					blurred.play()
+				} else if (data.type === "pauseBoth") {
+					original = document.querySelector("#original")
+					blurred = document.querySelector("#blurred")
+					original.pause();
+					blurred.pause()
+				} else if (data.type === 'seekBoth') {
+					original = document.querySelector("#original")
+					blurred = document.querySelector("#blurred")
+					original.currentTime = data.time;
+					blurred.currentTime = data.time;
 				}
 			});
 
