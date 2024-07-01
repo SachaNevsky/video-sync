@@ -40,7 +40,7 @@ export default function Page() {
                 const duration = parseFloat(videoRef.current.textContent.split("~~")[1])
                 const ttsDuration = parseFloat(videoRef.current.textContent.split("~~")[2])
 
-                window.socket.send(JSON.stringify({ type: 'playback', playback: duration/ttsDuration }));
+                window.socket.send(JSON.stringify({ type: 'playback', playback: duration / ttsDuration }));
                 // window.socket.send(JSON.stringify({ type: 'playback', playback: 0.3 }));
                 console.log()
                 speech.init({
@@ -74,7 +74,7 @@ export default function Page() {
             if (videoRef.current.currentTime !== timestamp) {
                 setTimestamp(videoRef.current.currentTime);
 
-                if(captions !== videoRef.current.textContent) {
+                if (captions !== videoRef.current.textContent) {
                     setCaptions(videoRef.current.textContent);
                     if (videoRef.current.spellcheck) {
                         handleReadOut();
@@ -93,7 +93,7 @@ export default function Page() {
 
 
     return (
-        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto">
             <div className="pt-4">
                 <a href="/" className="m-auto px-8 py-5 mx-3">Home 🏠</a>
                 <a href="/slower_speech/control" className="m-auto px-8 py-5 mx-3">Controls ⚙</a>
@@ -115,10 +115,12 @@ export default function Page() {
                     Film
                 </button>
             </div>
-            <video ref={videoRef} controls muted={muted} className="mx-auto w-3/5 row-span-8 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">
-                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
-            </video>
-            <div className="mx-auto w-3/5 py-4 text-center">
+            <div className="mx-auto w-3/5 py-4">
+                <video ref={videoRef} controls muted={muted} className="h-full mx-auto" src={`/${video}/${video}.mp4`} type="video/mp4">
+                    <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
+                </video>
+            </div>
+            <div className="mx-auto w-3/5 text-center">
                 <button className="py-5 px-8" onClick={handleMuted}>Mute {muted ? "🔇" : "🔊"}</button>
             </div>
         </div>

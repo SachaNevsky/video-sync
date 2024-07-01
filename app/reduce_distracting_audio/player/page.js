@@ -54,7 +54,7 @@ export default function Home() {
     }, [timestamp, speechVolume, backgroundVolume]);
 
     return (
-        <div className="bg-black py-4 h-screen text-white text-center grid m-auto grid-rows-11">
+        <div className="bg-black py-4 h-screen text-white text-center grid m-auto">
             <div className="pt-4">
                 <a href="/" className="m-auto px-8 py-5 mx-3">Home 🏠</a>
                 <a href="/reduce_distracting_audio/control" className="m-auto px-8 py-5 mx-3">Controls ⚙</a>
@@ -64,12 +64,21 @@ export default function Home() {
                     BBC News
                 </button>
                 <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
-                    Quiz Show
+                    University Challenge
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("the_chase")}>
+                    The Chase
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("industry")}>
+                    Drama TV Show
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("devil_wears_prada")}>
+                    Drama Film
                 </button>
             </div>
-            <video id="videoPlayer" ref={videoRef} controls muted className="mx-auto w-3/5 row-span-8 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">
-                <track id="subtitles" label="English" kind="subtitles" srcLang="en" src={`/${video}/${video}.vtt`} />
-            </video>
+            <div className="mx-auto w-3/5 py-4 text-center">
+                <video id="videoPlayer" ref={videoRef} controls muted className="h-full mx-auto" src={`/${video}/${video}.mp4`} type="video/mp4" />
+            </div>
             <audio id="speechAudio" src={`/${video}/${video}_speech.mp3`} type="audio/mpeg" ref={speechRef} muted={muted}></audio>
             <audio id="backgroundAudio" src={`/${video}/${video}_background.mp3`} type="audio/mpeg" ref={backgroundRef} muted={muted}></audio>
             <div className="mx-auto w-3/5 py-4 text-center">

@@ -58,7 +58,16 @@ export default function Page() {
                     BBC News
                 </button>
                 <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
-                    Quiz Show
+                    University Challenge
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("the_chase")}>
+                    The Chase
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("industry")}>
+                    Drama TV Show
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("devil_wears_prada")}>
+                    Drama Film
                 </button>
             </div>
             <div className="mx-auto w-3/5 py-4 text-center grid grid-cols-1 grid-rows-1">

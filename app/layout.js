@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
 					video.src = `/${data.video}/${data.video}.mp4`;
 					video.textContent = `~~${data.simplified}~~${data.textColor}`;
 				} else if (data.type === "slowDown") {
-					if(data.slowDown) {
+					if (data.slowDown) {
 						video.volume = 0;
 						video.spellcheck = data.slowDown;
 						video.textContent = `${data.caption}~~${data.duration}~~${data.ttsDuration}`;
@@ -69,12 +69,12 @@ export default function RootLayout({ children }) {
 					}
 				} else if (data.type === "back10") {
 					video.currentTime = data.time
-					if(speechAudioRef && backgroundAudioRef) {
+					if (speechAudioRef && backgroundAudioRef) {
 						speechAudioRef.currentTime = data.time
 						backgroundAudioRef.currentTime = data.time
 					}
 				} else if (data.type === "mute") {
-					if(data.mute) {
+					if (data.mute) {
 						video.volume = 1;
 					} else {
 						video.volume = 0;

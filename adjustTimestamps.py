@@ -2,9 +2,11 @@ from datetime import datetime, timedelta
 import json
 import re
 
+
 def write_json_file(data, file_path):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
+
 
 def parse_time(timeStr):
     time_parts = re.split(r"[:.]", str(timeStr))
@@ -13,6 +15,7 @@ def parse_time(timeStr):
     seconds = int(time_parts[2])
     milliseconds = int(time_parts[3])
     return timedelta(hours=hours, minutes=minutes, seconds=seconds, milliseconds=milliseconds)
+
 
 name = "industry"
 filename = f"./public/{name}/{name}.json"

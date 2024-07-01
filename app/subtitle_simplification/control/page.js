@@ -2,11 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Speech from "speak-tts";
+
 import bbc_space_simplified_captions from "/public/bbc_space/bbc_space_simplified.json";
 import bbc_space_captions from "/public/bbc_space/bbc_space.json";
 import university_challenge_simplified_captions from "/public/university_challenge/university_challenge_simplified.json"
 import university_challenge_captions from "/public/university_challenge/university_challenge.json"
 import the_chase_captions from "/public/the_chase/the_chase.json"
+import the_chase_simplified_captions from "/public/the_chase/the_chase_simplified.json"
+import industry_captions from "/public/industry/industry.json"
+import industry_simplified_captions from "/public/industry/industry_simplified.json"
+import devil_wears_prada_captions from "/public/devil_wears_prada/devil_wears_prada.json"
+import devil_wears_prada_simplified_captions from "/public/devil_wears_prada/devil_wears_prada_simplified.json"
 
 export default function Home() {
     const [timestamp, setTimestamp] = useState(0);
@@ -45,22 +51,6 @@ export default function Home() {
 
     const handleBack = () => {
         if (currentCaptionIndex > 0) {
-            // let newTime = 0;
-
-            // if (video === "bbc_space") {
-            //     if (!simplified) {
-            //         newTime = convertTime(bbc_space_captions.captions[currentCaptionIndex - 1].start);
-            //     } else {
-            //         newTime = convertTime(bbc_space_simplified_captions.captions[currentCaptionIndex - 1].start);
-            //     }
-            // } else if (video === "university_challenge") {
-            //     if (!simplified) {
-            //         newTime = convertTime(university_challenge_captions.captions[currentCaptionIndex - 1].start);
-            //     } else {
-            //         newTime = convertTime(university_challenge_simplified_captions.captions[currentCaptionIndex - 1].start);
-            //     }
-            // }
-
             const newTime = convertTime(captions[currentCaptionIndex - 1].start)
             setCurrentCaptionIndex(currentCaptionIndex - 1);
             setTimestamp(newTime);
@@ -104,22 +94,34 @@ export default function Home() {
 
     useEffect(() => {
         if (video === "bbc_space") {
-            if(simplified) {
+            if (simplified) {
                 setCaptions(bbc_space_simplified_captions.captions)
             } else {
                 setCaptions(bbc_space_captions.captions)
             }
         } else if (video === "university_challenge") {
-            if(simplified) {
+            if (simplified) {
                 setCaptions(university_challenge_simplified_captions.captions)
             } else {
                 setCaptions(university_challenge_captions.captions)
             }
         } else if (video === "the_chase") {
-            if(simplified) {
+            if (simplified) {
                 setCaptions(the_chase_simplified_captions.captions)
             } else {
                 setCaptions(the_chase_captions.captions)
+            }
+        } else if (video === "industry") {
+            if (simplified) {
+                setCaptions(industry_simplified_captions.captions)
+            } else {
+                setCaptions(industry_captions.captions)
+            }
+        } else if (video === "devil_wears_prada") {
+            if (simplified) {
+                setCaptions(devil_wears_prada_simplified_captions.captions)
+            } else {
+                setCaptions(devil_wears_prada_captions.captions)
             }
         }
     }, [video, simplified])

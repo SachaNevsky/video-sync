@@ -67,7 +67,7 @@ export default function Page() {
                 setTimestamp(videoRef.current.currentTime);
                 setCaptions(videoRef.current.textContent.split("~~")[0]);
                 setSimplified(toBool(videoRef.current.textContent.split("~~")[1]));
-                setTextColor(videoRef.current.textContent.split("~~")[2]);
+                // setTextColor(videoRef.current.textContent.split("~~")[2]);
                 if (videoRef.current.spellcheck) {
                     handleReadOut();
                 }
@@ -88,16 +88,24 @@ export default function Page() {
                 <a href="/subtitle_simplification/control" className="m-auto px-8 py-5 mx-3">Controls ⚙</a>
             </div>
             <div className="mx-auto w-3/5 py-4">
-                <button className="px-8 py-5" onClick={() => selectVideo("bbc_space")}>
+                <button className="py-5 px-8" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
-                <button className="px-8 py-5" onClick={() => selectVideo("the_chase")}>
-                    Quiz Show
+                <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
+                    University Challenge
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("the_chase")}>
+                    The Chase
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("industry")}>
+                    Drama TV Show
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("devil_wears_prada")}>
+                    Drama Film
                 </button>
             </div>
             <div className="mx-auto w-3/5 py-4 text-center row-span-7">
                 <video ref={videoRef} controls muted={muted} src={`/${video}/${video}.mp4`} type="video/mp4" playbackRate={2} className="h-full mx-auto"></video>
-                {timestamp.toFixed(3)}
             </div>
             <div className="mx-auto w-3/5 py-4 text-center grid-start-10 row-span-2">
                 {videoRef.current && simplified ? (

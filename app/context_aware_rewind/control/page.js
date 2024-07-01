@@ -1,8 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from "react";
+
 import bbc_space_captions from "/public/bbc_space/bbc_space.json";
 import university_challenge_captions from "/public/university_challenge/university_challenge.json"
+import the_chase_captions from "/public/the_chase/the_chase.json"
+import industry_captions from "/public/industry/industry.json"
+import devil_wears_prada_captions from "/public/devil_wears_prada/devil_wears_prada.json"
+
 
 export default function Page() {
     const [timestamp, setTimestamp] = useState(0);
@@ -114,11 +119,15 @@ export default function Page() {
     useEffect(() => {
         setComplexIndex([]);
         if (video === "bbc_space") {
-            console.log(video)
-            setCaptions(bbc_space_captions.captions)
+            setCaptions(bbc_space_captions)
         } else if (video === "university_challenge") {
-            console.log(video)
-            setCaptions(university_challenge_captions.captions)
+            setCaptions(university_challenge_captions)
+        } else if (video === "the_chase") {
+            setCaptions(the_chase_captions)
+        } else if (video === "industry") {
+            setCaptions(industry_captions)
+        } else if (video === "devil_wears_prada") {
+            setCaptions(devil_wears_prada_captions)
         }
     }, [video])
 
