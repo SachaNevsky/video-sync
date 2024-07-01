@@ -19,7 +19,7 @@ def flesch_kincaid(text):
     fk = min(fk, 12)
     return str(int(fk))
 
-name = "industry"
+name = "devil_wears_prada"
 filename = f"./public/{name}/{name}.vtt"
 jsonObj = json.loads('{"captions": []}')
 

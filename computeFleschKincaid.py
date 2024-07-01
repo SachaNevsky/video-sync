@@ -20,7 +20,7 @@ def write_json_file(data, file_path):
 def clean_text(text):
     return text.replace("\u00a0\n", " ").replace("\u2019", "'").replace("\n", " ").replace("  ", " ")
 
-name = "the_chase"
+name = "devil_wears_prada"
 filename = f"./public/{name}/{name}_simplified.json"
 with open(filename, 'r', encoding="utf-8") as file:
     data = json.load(file)

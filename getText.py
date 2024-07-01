@@ -6,7 +6,7 @@ def write_json_file(data, file_path):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
 
-name = "the_chase"
+name = "devil_wears_prada"
 filename = f"./public/{name}/{name}.json"
 time = timedelta(minutes=0, seconds=2, milliseconds=400)
 with open(filename, 'r', encoding="utf-8") as file:

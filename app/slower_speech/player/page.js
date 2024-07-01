@@ -102,11 +102,17 @@ export default function Page() {
                 <button className="py-5 px-8" onClick={() => selectVideo("bbc_space")}>
                     BBC News
                 </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("university_challenge")}>
+                    University Challenge
+                </button>
                 <button className="py-5 px-8" onClick={() => selectVideo("the_chase")}>
-                    Quiz Show
+                    The Chase
                 </button>
                 <button className="py-5 px-8" onClick={() => selectVideo("industry")}>
-                    Drama
+                    TV Show
+                </button>
+                <button className="py-5 px-8" onClick={() => selectVideo("devil_wears_prada")}>
+                    Film
                 </button>
             </div>
             <video ref={videoRef} controls muted={muted} className="mx-auto w-3/5 row-span-8 py-4" src={`/${video}/${video}.mp4`} type="video/mp4">

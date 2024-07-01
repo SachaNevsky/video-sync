@@ -5,6 +5,7 @@ import bbc_space_captions from "/public/bbc_space/bbc_space.json";
 import university_challenge_captions from "/public/university_challenge/university_challenge.json"
 import the_chase_captions from "/public/the_chase/the_chase.json"
 import industry_captions from "/public/industry/industry.json"
+import devil_wears_prada_captions from "/public/devil_wears_prada/devil_wears_prada.json"
 
 export default function Page() {
     const [timestamp, setTimestamp] = useState(0);
@@ -115,6 +116,16 @@ export default function Page() {
             }
         } else if (video === "industry") {
             for (const element of industry_captions.captions) {
+                if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
+                    setCurrentCaption(element.text);
+
+                    if (currentCaption !== videoRef.current.textContent.split("~~")[0]) {
+                        window.socket.send(JSON.stringify({ type: 'slowDown', caption: element.text, slowDown: slowDown, duration: element.duration, ttsDuration: element.ttsDuration }));
+                    }
+                }
+            }
+        } else if (video === "devil_wears_prada") {
+            for (const element of devil_wears_prada_captions.captions) {
                 if (parseFloat(convertTime(element.start)) < timestamp && parseFloat(convertTime(element.end)) >= timestamp) {
                     setCurrentCaption(element.text);
 
